@@ -1,6 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 3001; // Changé à 3001 pour éviter les conflits avec Next.js
@@ -47,6 +49,68 @@ app.post('/api/utilisateurs', (req, res) => {
         res.status(201).json({ id: result.insertId, nom, email });
     });
 });
+
+app.post('/signup', async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+      console.log('Received signup request:', username, email, password);
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('Hashed password:', hashedPassword);
+  
+      connection.query(
+        'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+        [username, email, hashedPassword],
+        (err, result) => {
+          if (err) {
+            console.error('Error during signup:', err);
+            res.status(500).json({ error: err.message });
+            return;
+          }
+          console.log('Insert result:', result);
+          res.status(201).json({ message: 'Utilisateur créé avec succès' });
+        }
+      );
+    } catch (error) {
+      console.error('Error during signup:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+    // Route de connexion
+    app.post('/login', (req, res) => {
+        const { email, password } = req.body;
+      
+        connection.query(
+          'SELECT * FROM users WHERE email = ?',
+          [email],
+          (err, rows) => {
+            if (err) {
+              console.error('Error during login:', err);
+              res.status(500).json({ error: err.message });
+              return;
+            }
+            if (rows.length === 0) {
+              return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+            }
+      
+            const user = rows[0];
+            bcrypt.compare(password, user.password, (err, validPassword) => {
+              if (err) {
+                console.error('Error during login:', err);
+                res.status(500).json({ error: err.message });
+                return;
+              }
+              if (!validPassword) {
+                return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+              }
+      
+              const token = jwt.sign({ userId: user.id }, 'votre_secret_jwt', { expiresIn: '1h' });
+              res.json({ token });
+            });
+          }
+        );
+      });
 
 // Démarrage du serveur
 app.listen(port, () => {
