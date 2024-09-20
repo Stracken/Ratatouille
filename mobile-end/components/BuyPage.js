@@ -15,9 +15,13 @@ const ArticleItem = ({ item, onQuantityChange, onRemove }) => {
             <Text style={styles.quantityButtonText}>-</Text>
           </TouchableOpacity>
           <Text style={styles.quantity}>{item.selectedQuantity}</Text>
-          <TouchableOpacity onPress={() => onQuantityChange(item.id, item.selectedQuantity + 1)} style={styles.quantityButton}>
-            <Text style={styles.quantityButtonText}>+</Text>
-          </TouchableOpacity>
+          <TouchableOpacity 
+  onPress={() => onQuantityChange(item.id, Math.min(item.quantity, item.selectedQuantity + 1))} 
+  style={styles.quantityButton}
+>
+  {/* empeche de selectionner plus que la quantité restante du produit en question */}
+  <Text style={styles.quantityButtonText}>+</Text>
+</TouchableOpacity>
         </View>
       </View>
       <TouchableOpacity onPress={() => onRemove(item.id)} style={styles.removeButton}>
@@ -77,7 +81,7 @@ const styles = StyleSheet.create({
       margin: 20,
       marginTop:30,
       textAlign: 'center',
-      color:Colors.danger
+      color:Colors.black
     },
     articleContainer: {
       flexDirection: 'row',
@@ -101,6 +105,7 @@ const styles = StyleSheet.create({
       fontSize: 18,
       fontWeight: 'bold',
       marginBottom: 5,
+      color:Colors.danger
     },
     price: {
       fontSize: 16,
@@ -131,11 +136,11 @@ const styles = StyleSheet.create({
       textAlign: 'right',
     },
     payButton: {
-      backgroundColor: '#4CAF50',
+      backgroundColor: 'darkgreen',
       padding: 15,
       borderRadius: 5,
       alignItems: 'center',
-      marginHorizontal: 20,
+      marginHorizontal: 15,
       marginBottom: 20,
     },
     payButtonText: {
@@ -144,7 +149,7 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
     },
     noFood:{
-      color:Colors.danger, 
+      color:Colors.black, 
       fontSize:20, 
       alignSelf:'center', 
       marginVertical:"50%"

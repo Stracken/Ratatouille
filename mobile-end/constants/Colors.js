@@ -8,11 +8,14 @@ export default {
     white:'white',
     black:'black',
     secondary:'lightgray',
+    lightDanger:'tomato',
     danger:'darkred',
+    
     success:'seagreen',
     greenAgri:'#7AA95C',
     greenDark:'#7AA95C',
     greenAgriLight:'#A4BD01',
     lightGray:'#F1EDED60',
-    darkRedLight:'#8B000050'
+    darkRedLight:'#8B000050',
+    fakeWhite:'#f5f5f5'
 }

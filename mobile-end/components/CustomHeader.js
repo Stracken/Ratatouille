@@ -1,240 +1,129 @@
-import { StyleSheet, Text, View, Pressable, SafeAreaView,TextInput } from "react-native";
-import React,{useState, useEffect, useMemo} from "react";
+import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Animated } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
 import { Image } from "react-native";
 import Colors from "../constants/Colors";
-import { Link } from "expo-router";
-import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Keyboard} from "react-native";
+import { Keyboard } from "react-native";
 
-
-const CustomHeader = ({openModal}) => {
-  const [headerVisible, setHeaderVisible] = useState(true);
+const CustomHeader = ({ openModal }) => {
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const animatedHeight = useRef(new Animated.Value(60)).current;
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setHeaderVisible(false); // Masquer le conteneur lorsque le clavier est ouvert
-    });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setHeaderVisible(true); // Afficher le conteneur lorsque le clavier est caché
+      setIsSearchActive(false);
     });
 
-    // Nettoyage des écouteurs d'événements
     return () => {
-      keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
     };
   }, []);
-  
-    const SearchBar=()=>(
-        <View style={styles.searchContainer}>
-                <View style={styles.searchSection}>
-                <View style={styles.searchField}>
-                <Ionicons
-             name="search-outline" size={15} color={Colors.danger}
-            style={styles.searchIcon}/>
-                <TextInput style={styles.input} placeholder="Agriculteurs, Producteurs, ..."/>
-                </View>  
-                <Link href={'/'} asChild/>  
-                <TouchableOpacity style={styles.optionButton} onPress={openModal}>
-                <Ionicons
-             name="person" size={22} color={Colors.danger}
-            style={styles.icon}/>
-                </TouchableOpacity>
-                </View>
-        </View>
-    )
-   
+
+  useEffect(() => {
+    Animated.timing(animatedHeight, {
+      toValue: isSearchActive ? 110 : 60,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isSearchActive]);
+
+  const toggleSearch = () => {
+    setIsSearchActive(!isSearchActive);
+  };
+
   return (
-    
-<SafeAreaView style={styles.safeArea}>
-
-        {headerVisible && ( // Afficher le conteneur seulement si headerVisible est vrai
-        <View style={styles.container}>
-          <TouchableOpacity>
-            <Image
-              source={require("../assets/images/logo.jpg")}
-              style={styles.logo}
-            />
+    <SafeAreaView style={styles.safeArea}>
+      <Animated.View style={[styles.container, { height: animatedHeight }]}>
+        <View style={styles.topRow}>
+          <Image
+            source={require("../assets/images/logo.jpg")}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>TerroTerro</Text>
+          <TouchableOpacity onPress={toggleSearch} style={styles.searchButton}>
+            <Ionicons name="search-outline" size={24} color={Colors.white}  />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.titleContainer}>
-            <Text style={styles.title}>TerroTerro</Text>
-            <View style={styles.locationName}>
-              <Text style={styles.subTitle}>Direct-Producteur</Text>
-            </View>
+          <TouchableOpacity 
+            style={styles.profileIcon} 
+            onPress={openModal}
+            accessible={true}
+            accessibilityLabel="Bouton d'accessibilité"
+            accessibilityHint="Appuyez pour accéder à votre page profil"
+            accessibilityRole="button"
+          >
+            <Ionicons name="person" size={24} color={Colors.white} />
           </TouchableOpacity>
         </View>
-      )}
-        <SearchBar/>
-        
+        {isSearchActive && (
+          <View style={styles.searchContainer}>
+            <Ionicons name="search-outline" size={20} color={Colors.danger} style={styles.searchIcon} />
+            <TextInput 
+              style={styles.input} 
+              placeholderTextColor={Colors.black} 
+              placeholder="Agriculteurs, Producteurs, ..."
+              autoFocus
+            />
+          </View>
+        )}
+      </Animated.View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default CustomHeader
+export default CustomHeader;
+
 const styles = StyleSheet.create({
-    safeArea:{
-        backgroundColor:Colors.greenAgri,
-    },  
-    container: {
-        flexDirection: "row",
-        backgroundColor: Colors.greenAgri,
-        marginBottom: 10,
-        gap:20,
-        alignItems: "center",
-        justifyContent:'flex-start',
-        paddingHorizontal:20,
-        width: "100%",
-        height:55
-      },
-    titleContainer:{
-        paddingRight:50
-      },
-    title:{
-       fontSize: 14,
-       color: Colors.black,
-       fontWeight:'bold'
-      },
-    subTitle:{
-       fontSize: 18,
-       color: Colors.danger,
-      },
-      locationName:{
-        flexDirection:'row',
-        alignItems:'center',
-        justifyContent:'center'
-      },
-    icon: {
-            maxHeight: 20,
-            maxWidth: 20,
-            margin: 10,
-          },
-    logo: {
-            flex: 1,
-            maxHeight: 50,
-            maxWidth: 50,
-            borderRadius:25,
-            backgroundColor:Colors.greenAgri
-        },
-        buttonProfil: {
-            backgroundColor:Colors.danger,
-            padding:10,
-            borderRadius:50
-              },
-        searchContainer:{
-            height:50,
-            backgroundColor:Colors.greenAgri,
-            
-            marginBottom:5
-        },
-        optionButton:{
-            borderRadius:50,
-            paddingRight:20,
-        },
-        searchField:{
-            flex:1,
-            marginVertical:6,
-            backgroundColor:Colors.darkRedLight,
-            borderRadius:8,
-            flexDirection:'row',
-            alignItems:'center'
-        },
-        input:{
-            padding:2,
-            color:Colors.danger,
-            fontSize:15,
-
-
-        },
-        searchIcon:{
-            paddingHorizontal:10
-        },
-        searchSection:{
-            flexDirection:'row',
-            gap:30,
-            flex:1,
-            marginLeft:20,
-        }
-    })
-
-// const Header = () => {
-//   const navigation = useNavigation();
-//   return (
-//     <View style={styles.container}>
-//       <Image
-//         source={require("../assets/images/logo.jpg")}
-//         style={styles.logo}
-//       />
-//       <Text style={styles.logoTitle}>TerroTerro</Text>
-//       <View style={styles.logoContainer}>
-//         <Pressable
-//           style={({ pressed }) => [
-//             {
-//               backgroundColor: pressed
-//                 ? Colors.greenAgri
-//                 : Colors.greenAgriLight,
-//             },
-//           ]}
-//           onPress={() => navigation.navigate("Profil")}
-//         >
-//           <Image
-//             source={require("../assets/images/user.png")}
-//             style={styles.icon}
-//           />
-//         </Pressable>
-//           <Link href="./Products.js">
-//         <Pressable
-//           style={({ pressed }) => [
-//             {
-//               backgroundColor: pressed
-//                 ? Colors.greenAgri
-//                 : Colors.greenAgriLight,
-//             },
-//           ]}
-//         >
-//           <Image
-//             source={require("../assets/images/shopping.png")}
-//             style={styles.icon}
-//           />
-//         </Pressable>
-//         </Link>
-//       </View>
-//     </View>
-//   );
-// };
-// export default Header;
-// const styles = StyleSheet.create({
-//   container: {
-//     flexDirection: "row",
-//     backgroundColor: Colors.greenAgriLight,
-//     marginBottom: 30,
-//     alignItems: "center",
-//     justifyContent: "space-between",
-
-//     width: "100%",
-//   },
-
-//   logoTitle: {
-//     color: "#fff",
-//     fontSize: 30,
-//     margin: 10,
-//   },
-//   logoContainer: {
-//     flexDirection: "row",
-//     height: 50,
-//   },
-//   logo: {
-//     flex: 1,
-//     maxHeight: 50,
-//     maxWidth: 50,
-//     margin: 10,
-//   },
-//   icon: {
-//     maxHeight: 20,
-//     maxWidth: 20,
-//     margin: 10,
-//   },
-//   buttonProfil: {
-//     borderBlockColor: "black",
-//   },
-// });
+  safeArea: {
+    backgroundColor: Colors.greenAgri,
+  },
+  container: {
+    backgroundColor: Colors.greenAgri,
+    paddingHorizontal: 15,
+    overflow: 'hidden',
+  },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: 'space-evenly',
+    
+    height: 40,
+    marginBottom:10
+  },
+  title: {
+    fontSize: 24,
+    color: Colors.black,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  logo: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+  },
+  searchButton: {
+    paddingHorizontal: 10,
+  },
+  profileIcon: {
+    paddingHorizontal: 10,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.fakeWhite,
+    borderRadius: 10,
+    marginTop: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    height: 40,
+  },
+  searchIcon: {
+    marginRight: 5,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.danger,
+  },
+});

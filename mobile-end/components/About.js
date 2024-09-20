@@ -7,6 +7,7 @@ import AboutUsScreen from "../screens/AboutUsScreen";
 import ContactUsScreen from "../screens/ContactUsScreen";
 import Colors from "../constants/Colors";
 import { Dimensions } from "react-native";
+import CookiesPage from "./CookiesPage";
 
 const Stack2 = createStackNavigator();
 const { height } = Dimensions.get("window");
@@ -24,6 +25,9 @@ const AboutScreen = ({ navigation }) => (
       <TouchableOpacity onPress={() => navigation.navigate("MentionsLegales")}>
         <Text style={styles.aboutPageText}>Mentions Légales</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("Cookies")}>
+        <Text style={styles.aboutPageText}>Cookies</Text>
+      </TouchableOpacity>
     </View>
   </ScrollView>
 );
@@ -35,31 +39,41 @@ const About = () => {
         headerTitle: ({ children }) => (
           <Text style={styles.headerTitle}>{children}</Text>
         ),
+        
         headerTitleAlign: "center",
         headerTitleContainerStyle: {
           flex: 1, // Permet d'utiliser l'espace disponible
           justifyContent: "center", // Centre verticalement
           flexDirection: "row",
           marginHorizontal: -60, // Permet d'augmenter l'espace disponible,
+          
         },
         headerTitleContainerStyle: {
           justifyContent: "center",
           height: 30,
+          
         },
         headerLeftContainerStyle: {
           alignItems: "center",
           height: 30,
         },
         headerStyle: {
-          backgroundColor: Colors.danger,
+          backgroundColor: "#F0F0F0",
+          borderBottomWidth: 0.5,
+    borderBottomColor: '#000',
         },
-        headerTintColor: "#fff",
+        headerTintColor: "black",
+        
+        
       }}
     >
       <Stack2.Screen
         name="About"
         component={AboutScreen}
-        options={{ title: "A Propos" }}
+        options={{ title: "A Propos",
+        headerShown:false
+         }}
+       
       />
       <Stack2.Screen
         name="AboutUs"
@@ -76,6 +90,7 @@ const About = () => {
         component={MentionsLegales}
         options={{ title: "Mentions L\u00E9gales" }}
       />
+      <Stack2.Screen name="Cookies" component={CookiesPage} />
     </Stack2.Navigator>
   );
 };
@@ -102,6 +117,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#fff",
+    color: "black",
   },
 });

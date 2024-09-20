@@ -69,13 +69,13 @@ const SignUpScreen = ({ onBackToSignIn }) => {
           style={[styles.radioButton, userType === 'producteur' && styles.radioButtonSelected]}
           onPress={() => setUserType('producteur')}
         >
-          <Text>Producteur</Text>
+          <Text  style={{color:Colors.white}}>Producteur</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.radioButton, userType === 'particulier' && styles.radioButtonSelected]}
           onPress={() => setUserType('particulier')}
         >
-          <Text>Particulier</Text>
+          <Text style={{color:Colors.white}}>Particulier</Text>
         </TouchableOpacity>
       </View>
       
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor:Colors.greenAgriLight
+    backgroundColor:Colors.greenAgri
   },
   title: {
     fontSize: 24,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: Colors.greenAgri,
+    borderColor: Colors.white,
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   },
   radioButton: {
     borderWidth: 1,
-    borderColor: Colors.greenAgri,
+    borderColor: Colors.white,
     padding: 10,
     marginLeft: 10,
     borderRadius: 5,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     
   },
   radioButtonSelected: {
-    backgroundColor: Colors.greenAgri,
+    backgroundColor: "darkgreen",
   },
   button: {
     backgroundColor: Colors.danger,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   backButtonText: {
-    color: Colors.danger,
+    color: Colors.white,
     textAlign: 'center',
   },
 });

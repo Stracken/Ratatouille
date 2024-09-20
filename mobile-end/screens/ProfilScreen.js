@@ -37,7 +37,10 @@ const Profil = () => {
         <Text style={styles.typeClient}>{user.profil}</Text>
 
         <Text style={styles.textProfilPage}>
-          Voici ton e-mail de connexion: {user.email}
+          Voici ton e-mail de connexion: 
+        </Text>
+        <Text style={styles.emailProfilPage}>
+        {user.email}
         </Text>
         {/* {users.map((user) => (
         <View key={user.id}>
@@ -82,17 +85,22 @@ const styles = StyleSheet.create({
   },
   buttonProfilPage: {
     color: Colors.danger,
-    backgroundColor: Colors.greenAgriLight,
+    backgroundColor: Colors.black,
   },
   textProfilPage: {
     color: Colors.black,
+
+  },
+  emailProfilPage:{
+    color: "darkgreen",
+    fontWeight: "bold",
   },
   typeClient: {
-    color: Colors.danger,
+    color: "darkgreen",
     fontWeight: "bold",
   },
   clientName: {
-    color: Colors.danger,
+    color: "darkgreen",
     fontWeight: "bold",
   },
 });

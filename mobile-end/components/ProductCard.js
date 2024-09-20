@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Text, TouchableOpacity, View, StyleSheet, Image } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, Image, ScrollView } from "react-native";
 import { Alert } from "react-native";
 import Colors from "../constants/Colors";
+import { useNavigation } from "@react-navigation/native";
+import Category from "./Category";
 
 const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) => {
   const [selectedQuantity, setSelectedQuantity] = useState(cartQuantity);
-
+  const navigation = useNavigation();
   useEffect(() => {
     setSelectedQuantity(cartQuantity );
   }, [cartQuantity]);
@@ -24,29 +26,50 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
       Alert.alert("Erreur", "La quantité doit être supérieure à zéro pour ajouter au panier.");
     }
   };
-
+  const navigateToProductDetails = () => {
+    // navigation.navigate('ProductDetails', { product: item, Category: item });
+    navigation.navigate('Produits', {screen:"ProductDetails", params:{product: item } });
+  };
   return (
-    <View style={styles.card}>
-      <Image source={item.image} style={styles.productImage} />
-      <Text style={styles.productTitle}>{item.title}</Text>
+  
+<View style={styles.card}>
+      <TouchableOpacity onPress={navigateToProductDetails} accessible={true} accessibilityLabel={`Voir les détails de ${item.title}`} accessibilityHint="Appuyez pour voir les détails complets du produit">
+        <Image source={item.image} style={styles.productImage} />
+        <Text style={styles.productTitle}>{item.title}</Text>
+      </TouchableOpacity>
       <Text>Prix: {item.price}€</Text>
       <Text>Quantité disponible: {item.quantity}</Text>
       <View style={styles.quantityContainer}>
-        <TouchableOpacity onPress={() => handleQuantityChange(Math.max(0, selectedQuantity - 1))}>
+        <TouchableOpacity 
+        accessible={true}
+        accessibilityLabel="Bouton de décrémentation"
+        accessibilityHint="Appuyez pour réduire la quantité de produit voulu"
+        accessibilityRole="button"
+        onPress={() => handleQuantityChange(Math.max(0, selectedQuantity - 1))}>
           <Text style={styles.quantityButton}>-</Text>
         </TouchableOpacity>
         <Text style={styles.quantityText}>{selectedQuantity}</Text>
-        <TouchableOpacity onPress={() => handleQuantityChange(selectedQuantity + 1)}>
+        <TouchableOpacity 
+        accessible={true}
+        accessibilityLabel="Bouton d'incrémentation"
+        accessibilityHint="Appuyez pour augmenter la quantité de produit voulu"
+        accessibilityRole="button"
+        onPress={() => handleQuantityChange(selectedQuantity + 1)}>
           <Text style={styles.quantityButton}>+</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity 
+      <TouchableOpacity
+      accessible={true}
+      accessibilityLabel="Bouton de validation"
+      accessibilityHint="Appuyez pour valider ou mettre a jour la mise au panier du produit"
+      accessibilityRole="button" 
         style={styles.addButton} 
         onPress={handleAddToCart}
       >
-        <Text>{cartQuantity > 0 ? 'Mettre à jour le panier' : 'Ajouter au panier'}</Text>
+        <Text style={styles.textAddBuy}>{cartQuantity > 0 ? 'Mettre à jour le panier' : 'Ajouter au panier'}</Text>
       </TouchableOpacity>
     </View>
+    
   );
 };
   const styles = StyleSheet.create({
@@ -58,6 +81,7 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: 10,
+      fontSize:18
     },
     picker: {
       width: '48%',
@@ -72,7 +96,7 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
       borderWidth: 1,
       borderColor: Colors.danger,
       padding: 10,
-      marginBottom: 10,
+      paddingBottom:10
     },
     productImage: {
       width: '100%',
@@ -105,6 +129,10 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
       alignItems: 'center',
       marginTop: 5,
       borderRadius:10
+    },
+    textAddBuy:{
+      color:Colors.white,
+      fontWeight:'bold'
     },
     buyButton: {
       backgroundColor: 'green',

@@ -8,7 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AuthProvider, useAuth } from './AuthContext';
 import { CartProvider } from "./components/CartContext";
-import MyTabs from './components/MyTabs';
+import CookiesPage from './components/CookiesPage';
 
 const Stack = createStackNavigator();
 
@@ -24,11 +24,14 @@ function AppContent()  {
       <CartProvider>
         <NavigationContainer>
           <Stack.Navigator>
+            
+        
             {userToken == null ? (
               <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
             ) : (
               <Stack.Screen name="MainApp" component={MainApp} options={{ headerShown: false }} />
             )}
+            
           </Stack.Navigator>
         </NavigationContainer>
         </CartProvider>

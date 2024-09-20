@@ -1,39 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity,Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import ProductCard from './ProductCard';
 import { useCart } from './CartContext';
-import { categories } from './Category'; // Importez les catégories
+import { categories } from './Category';
 import Colors from '../constants/Colors';
-import { collectManifestSchemes } from 'expo-linking';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState('asc');
-  const [categoryFilter, setCategoryFilter] = useState(ALL_CATEGORIES);
+  const [categoryFilter, setCategoryFilter] = useState('Tous les produits');
   const navigation = useNavigation();
+  const route = useRoute();
   const { cart, addToCart, updateCartItemQuantity } = useCart();
   const ALL_CATEGORIES = 'Tous les produits';
 
   useEffect(() => {
-    // Simuler le chargement des produits depuis une API
-    const fetchedProducts = [
-      { id: 1, title: 'Pommes', price: 2.5, quantity: 100, image: require('../assets/images/pomme2.jpg')
-        , category: 'Fruits' },
-      { id: 2, title: 'Bananes', price: 1.8, quantity: 150, image: require('../assets/images/banane.jpg')
-        , category: 'Fruits' },
-      { id: 3, title: 'Carottes', price: 1.2, quantity: 200, image: require('../assets/images/carotte2.jpg')
-        , category: 'Legumes' },
-      { id: 4, title: 'Steak', price: 15.0, quantity: 50, image: require('../assets/images/steack.jpg')
-        , category: 'Viandes' },
-      { id: 5, title: 'Saumon', price: 12.0, quantity: 75, image: require('../assets/images/saumon.jpg')
-        , category: 'Poissons' },
-    ];
-    setProducts(fetchedProducts);
-    setFilteredProducts(fetchedProducts);
-  }, []);
+    console.log("Selected category from route:", route.params?.selectedCategory);
+    const allProducts = categories.flatMap(category => category.products);
+    setProducts(allProducts);
+
+    const selectedCategory = route.params?.selectedCategory;
+    if (selectedCategory && selectedCategory !== ALL_CATEGORIES) {
+        filterByCategory(selectedCategory);
+        setCategoryFilter(selectedCategory);
+    } else {
+        setFilteredProducts(allProducts);
+        setCategoryFilter(ALL_CATEGORIES);
+    }
+// assurer la reinitialisation de l'etat de products quand on quitte l'ecran
+    return () => {
+        setFilteredProducts([]);
+        setCategoryFilter(ALL_CATEGORIES);
+    };
+}, [route.params?.selectedCategory]);
+
+
 
   const sortProducts = (order) => {
     const sorted = [...filteredProducts].sort((a, b) => {
@@ -43,16 +47,16 @@ const Products = () => {
     setSortOrder(order);
   };
 
-  const filterByCategory = (category) => {
+ const filterByCategory = (category) => {
+  console.log("Filtering by category:", category);
     if (category === ALL_CATEGORIES) {
-      setFilteredProducts(products);
+        setFilteredProducts(products);
     } else {
-      const filtered = products.filter(product => product.category === category);
-      setFilteredProducts(filtered);
+        const categoryProducts = categories.find(cat => cat.title === category)?.products || [];
+        setFilteredProducts(categoryProducts);
     }
     setCategoryFilter(category);
-  };
-  
+};
 
   const handleAddToCart = (product, quantity) => {
     addToCart(product, quantity);
@@ -65,8 +69,8 @@ const Products = () => {
           selectedValue={sortOrder}
           onValueChange={(itemValue) => sortProducts(itemValue)}
           style={styles.picker}
-          itemStyle={{ color: Colors.danger}}
-          dropdownIconColor={{ color:Colors.danger}}
+          itemStyle={{ color: Colors.danger }}
+          dropdownIconColor={Colors.danger}
         >
           <Picker.Item label="Prix croissant" value="asc"/>
           <Picker.Item label="Prix décroissant" value="desc" />
@@ -75,8 +79,8 @@ const Products = () => {
           selectedValue={categoryFilter}
           onValueChange={(itemValue) => filterByCategory(itemValue)}
           style={styles.picker}
-          itemStyle={{ color: Colors.danger}}
-          dropdownIconColor={{ color: Colors.danger}}
+          itemStyle={{ color: Colors.danger }}
+          dropdownIconColor={Colors.danger}
         >
           <Picker.Item color={Colors.danger} label={ALL_CATEGORIES} value={ALL_CATEGORIES} />
           {categories.map((category) => (
@@ -96,7 +100,11 @@ const Products = () => {
         )}
         keyExtractor={item => item.id.toString()}
       />
-      <TouchableOpacity 
+      <TouchableOpacity
+        accessible={true}
+        accessibilityLabel="Bouton de validation"
+        accessibilityHint="Appuyez pour valider votre achat"
+        accessibilityRole="button" 
         style={styles.buyButton}
         onPress={() => navigation.navigate('BuyPage')}
       >
@@ -118,62 +126,24 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: '48%',
-    color:Colors.danger
+    color: Colors.danger
   },
-  producerInput: {
-    width: '48%',
-    borderWidth: 1,
-    borderColor: 'gray',
-    padding: 5,
-  },
-  card: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    padding: 10,
-    marginBottom: 10,
-  },
-  productImage: {
-
-    width: 50,
-    height: 50,
-  },
-  productTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  quantityButton: {
-    fontSize: 24,
-    paddingHorizontal: 10,
-  },
-  quantityText: {
-    fontSize: 18,
-    paddingHorizontal: 10,
-  },
-  addButton: {
-    backgroundColor: 'lightblue',
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 5,
+  pickerItemCategory: {
+    color: Colors.danger,
+    fontSize: 18
   },
   buyButton: {
-    backgroundColor: 'green',
+    backgroundColor: "darkgreen",
     padding: 15,
     alignItems: 'center',
     marginTop: 10,
+    borderRadius: 5,
   },
   buyButtonText: {
     color: 'white',
     fontSize: 18,
+    fontWeight: 'bold',
   },
-  pickerItemCategory:{
-    color:Colors.danger
-  }
 });
 
 export default Products;
