@@ -65,16 +65,18 @@ const AboutStack = () => (
 const screenOptions = ({ navigation }) => ({
   headerStyle: {
     backgroundColor: Colors.fakeWhite,
+    
   },
   headerTitleStyle: {
     color: Colors.black,
     fontSize: 20,
   },
   headerTitleAlign: "center",
+ 
   headerLeft: ({ canGoBack }) => {
     const navigation = useNavigation();
     return canGoBack ? (
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10, backgroundColor:Colors.fakeWhite }}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 20, backgroundColor:Colors.fakeWhite }}>
         <Ionicons name="arrow-back" size={24} color={Colors.black} />
       </TouchableOpacity>
     ) : null;

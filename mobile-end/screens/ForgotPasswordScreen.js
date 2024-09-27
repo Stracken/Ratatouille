@@ -45,7 +45,7 @@ const ForgotPasswordScreen = ({ navigation, onBackToSignIn }) => {
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.backButton} 
-        onPress={onBackToSignIn} // Utilisez onBackToSignIn ici
+        onPress={ () => navigation.goBack() }// Utilisez onBackToSignIn ici
       >
         <Text style={styles.backButtonText}>Retour à la connexion</Text>
       </TouchableOpacity>

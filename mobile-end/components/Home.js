@@ -5,9 +5,26 @@ import WebviewComponent from "./WebviewComponent";
 import Carousel from '../components/Carousel';
 import HomeProducts from './HomeProducts';
 import { useNavigation } from "@react-navigation/native";
+import ButtonComponent from './ButtonComponent'
+import { useAuth } from '../context/AuthContext'
 
 const Home = () => {
- 
+  const { signOut } = useAuth();
+  const testUserEndpoint = async ()=>{
+    try{
+      const response = await fetch('https://example.com/api/testuser', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + auth.token}}
+        )
+          }
+       
+         catch {
+          console.log('Error in testUserEndpoint')
+        
+  }}
+
   
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -30,6 +47,17 @@ const Home = () => {
       <Text style={styles.additionalText}>
         iatur nulla reprehenderit. Assumenda dolorem vero odit. Accusamus fugiat dolores esse voluptatum qui cupiditate illo corporis necessitatibus, liberm rem error sunt porro.
       </Text>
+      
+     <ButtonComponent
+          title="Déconnexion"
+          onPress={signOut}
+          style={styles.buttonProfilPage}
+        />
+     <ButtonComponent
+          title="testuserEndpoint"
+          onPress={testUserEndpoint}
+          style={styles.buttonProfilPage}
+        />
     </ScrollView>
   );
 };

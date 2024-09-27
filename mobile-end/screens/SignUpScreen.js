@@ -1,33 +1,112 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  ScrollView 
-} from 'react-native';
-import Colors from '../constants/Colors';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import Colors from "../constants/Colors";
+import { signUp } from "../api/api";
 
-const SignUpScreen = ({ onBackToSignIn }) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [userType, setUserType] = useState('');
-  const [password, setPassword] = useState('');
-  const [address, setAddress] = useState('');
-  const [companyName, setCompanyName] = useState('');
+const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
+  // const [userType, setUserType] = useState("");
+  const [password, setPassword] = useState("");
+  const [address, setAddress] = useState("");
+  const [ville, setVille] = useState("");
+  // const [companyName, setCompanyName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [postalCode, setPostalCode] = useState("");
+  const [error, setError] = useState(null);
+  const validateForm = () => {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !telephone ||
+      !ville ||
+      !password ||
+      !postalCode ||
+      !address
+    ) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires");
+      return false;
+    }
+    // if (userType === "producteur" && !companyName) {
+    //   Alert.alert("Erreur", "Veuillez entrer la raison sociale");
+    //   return false;
+    // }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert("Erreur", "Veuillez entrer une adresse email valide");
+      return false;
+    }
+    if (!/^[0-9]{5}$/.test(postalCode)) {
+      Alert.alert("Erreur", "Code postal invalide");
+      return false;
+    }
+    if (!postalCode.length == 5) {
+      Alert.alert("Erreur", "Le code postal doit contenir 5 caractères");
+      return false;
+    }
+    if (password.length < 6) {
+      Alert.alert(
+        "Erreur",
+        "Le mot de passe doit contenir au moins 6 caractères"
+      );
+      return false;
+    }
+    return true;
+  };
+  const handleSignUp = async () => {
+    if (!validateForm()) return;
 
-  const handleSignUp = () => {
-    // Logique d'inscription à implémenter
-    console.log('Inscription en cours...');
+    setIsLoading(true);
+    setError(null); // Réinitialiser l'erreur au début de chaque tentative d'inscription
+    try {
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        telephone,
+        // userType,
+        postalCode,
+        password,
+        address,
+        ville
+        // companyName: userType === "producteur" ? companyName : undefined,
+      };
+      const response = await signUp(userData);
+      Alert.alert("Succès", "Inscription réussie !", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
+    } catch (error) {
+      if (error.message === 'Cet email est déjà utilisé') {
+        Alert.alert(
+          "Erreur",
+          "Cet email est déjà utilisé. Veuillez utiliser une autre adresse email."
+        );
+      } else {
+        Alert.alert(
+          "Erreur",
+          error.message || "Une erreur est survenue lors de l'inscription"
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Inscription</Text>
-      
+
       <TextInput
         style={styles.input}
         placeholder="Prénom"
@@ -35,7 +114,7 @@ const SignUpScreen = ({ onBackToSignIn }) => {
         onChangeText={setFirstName}
         placeholderTextColor={Colors.white}
       />
-      
+
       <TextInput
         style={styles.input}
         placeholder="Nom"
@@ -43,7 +122,7 @@ const SignUpScreen = ({ onBackToSignIn }) => {
         onChangeText={setLastName}
         placeholderTextColor={Colors.white}
       />
-      
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -52,33 +131,46 @@ const SignUpScreen = ({ onBackToSignIn }) => {
         keyboardType="email-address"
         placeholderTextColor={Colors.white}
       />
-      
+
       <TextInput
         style={styles.input}
         placeholder="Téléphone"
-        value={phone}
-        onChangeText={setPhone}
+        value={telephone}
+        onChangeText={setTelephone}
         keyboardType="phone-pad"
         placeholderTextColor={Colors.white}
       />
-      
-      <View style={styles.radioContainer}>
-        <Text style={{color:Colors.white, fontWeight:'bold',fontStyle:'italic'}}>
-            Type d'utilisateur :</Text>
-        <TouchableOpacity
-          style={[styles.radioButton, userType === 'producteur' && styles.radioButtonSelected]}
-          onPress={() => setUserType('producteur')}
+
+      {/* <View style={styles.radioContainer}>
+        <Text
+          style={{
+            color: Colors.white,
+            fontWeight: "bold",
+            fontStyle: "italic",
+          }}
         >
-          <Text  style={{color:Colors.white}}>Producteur</Text>
+          Type d'utilisateur :
+        </Text>
+        <TouchableOpacity
+          style={[
+            styles.radioButton,
+            userType === "producteur" && styles.radioButtonSelected,
+          ]}
+          onPress={() => setUserType("producteur")}
+        >
+          <Text style={{ color: Colors.white }}>Producteur</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.radioButton, userType === 'particulier' && styles.radioButtonSelected]}
-          onPress={() => setUserType('particulier')}
+          style={[
+            styles.radioButton,
+            userType === "particulier" && styles.radioButtonSelected,
+          ]}
+          onPress={() => setUserType("particulier")}
         >
-          <Text style={{color:Colors.white}}>Particulier</Text>
+          <Text style={{ color: Colors.white }}>Particulier</Text>
         </TouchableOpacity>
-      </View>
-      
+      </View> */}
+
       <TextInput
         style={styles.input}
         placeholder="Mot de passe"
@@ -87,7 +179,7 @@ const SignUpScreen = ({ onBackToSignIn }) => {
         secureTextEntry
         placeholderTextColor={Colors.white}
       />
-      
+
       <TextInput
         style={styles.input}
         placeholder="Adresse"
@@ -96,8 +188,26 @@ const SignUpScreen = ({ onBackToSignIn }) => {
         multiline
         placeholderTextColor={Colors.white}
       />
-      
-      {userType === 'producteur' && (
+      <TextInput
+        style={styles.input}
+        placeholder="Ville"
+        value={ville}
+        onChangeText={setVille}
+        multiline
+        placeholderTextColor={Colors.white}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Code Postal"
+        placeholderTextColor={Colors.white}
+        value={postalCode}
+        onChangeText={setPostalCode}
+        keyboardType="numeric"
+        maxLength={5}
+      />
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+      {/* {userType === "producteur" && (
         <TextInput
           style={styles.input}
           placeholder="Raison sociale"
@@ -105,12 +215,15 @@ const SignUpScreen = ({ onBackToSignIn }) => {
           onChangeText={setCompanyName}
           placeholderTextColor={Colors.white}
         />
+      )} */}
+      {isLoading ? (
+        <ActivityIndicator size="large" color={Colors.danger} />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>S'inscrire</Text>
+        </TouchableOpacity>
       )}
-      
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>S'inscrire</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.backButton} onPress={onBackToSignIn}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>Retour à la connexion</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -120,16 +233,16 @@ const SignUpScreen = ({ onBackToSignIn }) => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
-    backgroundColor:Colors.greenAgri
+    backgroundColor: Colors.greenAgri,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
-    color:Colors.white
+    textAlign: "center",
+    color: Colors.white,
   },
   input: {
     borderWidth: 1,
@@ -137,11 +250,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-    color:Colors.danger,
+    color: Colors.danger,
   },
   radioContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
   },
   radioButton: {
@@ -150,8 +263,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 10,
     borderRadius: 5,
-    color:Colors.white
-    
+    color: Colors.white,
   },
   radioButtonSelected: {
     backgroundColor: "darkgreen",
@@ -160,18 +272,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.danger,
     padding: 15,
     borderRadius: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   backButton: {
     marginTop: 10,
   },
   backButtonText: {
     color: Colors.white,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 

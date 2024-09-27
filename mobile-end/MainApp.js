@@ -12,6 +12,7 @@ import React, { useRef, useMemo, useState } from "react";
 import Profil from "./screens/ProfilScreen";
 
 
+
 export default function MainApp() {
   const bottomSheetModalRef = useRef(null);
   const openModal = () => {
@@ -20,7 +21,8 @@ export default function MainApp() {
   const snapPoints = useMemo(() => ["95%"], []);
 
   return (
-    <GestureHandlerRootView>
+    
+<GestureHandlerRootView>
       <BottomSheetModalProvider>
         <StatusBar style="auto" />
         <View style={styles.container}>
@@ -43,6 +45,8 @@ export default function MainApp() {
         </View>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
+   
+    
   );
 }
 

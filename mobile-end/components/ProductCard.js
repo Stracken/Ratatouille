@@ -23,7 +23,7 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
     if (selectedQuantity > 0) {
       addToCart(item, selectedQuantity);
     } else {
-      Alert.alert("Erreur", "La quantité doit être supérieure à zéro pour ajouter au panier.");
+      Alert.alert("Erreur", "La quantit\u00E9 doit être supérieure à z\u00E9ro pour ajouter au panier.");
     }
   };
   const navigateToProductDetails = () => {
