@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const port = 3001; // Changé à 3001 pour éviter les conflits avec Next.js
+const port = 3001;
 
 // Configuration de la connexion à la base de données
 const connection = mysql.createConnection({
@@ -25,92 +25,101 @@ connection.connect((err) => {
 });
 
 // Middleware
-app.use(cors()); // Permet les requêtes cross-origin
+app.use(cors());
 app.use(express.json());
 
-// Routes
-app.get('/api/utilisateurs', (req, res) => {
-    connection.query('SELECT * FROM utilisateurs', (err, results) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json(results);
-    });
-});
+// Middleware pour vérifier le token JWT
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
 
-app.post('/api/utilisateurs', (req, res) => {
-    const { nom, email } = req.body;
-    connection.query('INSERT INTO utilisateurs (nom, email) VALUES (?, ?)', [nom, email], (err, result) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.status(201).json({ id: result.insertId, nom, email });
+    jwt.verify(token, 'votre_secret_jwt', (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
     });
-});
+};
 
 app.post('/signup', async (req, res) => {
     try {
-      const { username, email, password } = req.body;
-      console.log('Received signup request:', username, email, password);
-  
-      const hashedPassword = await bcrypt.hash(password, 10);
-      console.log('Hashed password:', hashedPassword);
-  
-      connection.query(
-        'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-        [username, email, hashedPassword],
-        (err, result) => {
-          if (err) {
-            console.error('Error during signup:', err);
-            res.status(500).json({ error: err.message });
-            return;
-          }
-          console.log('Insert result:', result);
-          res.status(201).json({ message: 'Utilisateur créé avec succès' });
-        }
-      );
-    } catch (error) {
-      console.error('Error during signup:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+        const { email, password, nom, prenom, adresse, ville, code_postal, telephone } = req.body;
+        console.log('Received signup request:', email, nom, prenom);
 
-    // Route de connexion
-    app.post('/login', (req, res) => {
-        const { email, password } = req.body;
-      
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log('Hashed password:', hashedPassword);
+
         connection.query(
-          'SELECT * FROM users WHERE email = ?',
-          [email],
-          (err, rows) => {
+            'INSERT INTO user (email, mot_de_passe, role, nom, prenom, adresse, ville, code_postal, telephone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [email, hashedPassword, 'client', nom, prenom, adresse, ville, code_postal, telephone],
+            (err, result) => {
+                if (err) {
+                    console.error('Error during signup:', err);
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+                console.log('Insert result:', result);
+                res.status(201).json({ message: 'Utilisateur créé avec succès' });
+            }
+        );
+    } catch (error) {
+        console.error('Error during signup:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+    connection.query(
+        'SELECT * FROM user WHERE email = ?',
+        [email],
+        (err, rows) => {
             if (err) {
-              console.error('Error during login:', err);
-              res.status(500).json({ error: err.message });
-              return;
-            }
-            if (rows.length === 0) {
-              return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-            }
-      
-            const user = rows[0];
-            bcrypt.compare(password, user.password, (err, validPassword) => {
-              if (err) {
                 console.error('Error during login:', err);
                 res.status(500).json({ error: err.message });
                 return;
-              }
-              if (!validPassword) {
+            }
+            if (rows.length === 0) {
                 return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-              }
-      
-              const token = jwt.sign({ userId: user.id }, 'votre_secret_jwt', { expiresIn: '1h' });
-              res.json({ token });
+            }
+
+            const user = rows[0];
+            bcrypt.compare(password, user.mot_de_passe, (err, validPassword) => {
+                if (err) {
+                    console.error('Error during login:', err);
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+                if (!validPassword) {
+                    return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+                }
+
+                const token = jwt.sign({ userId: user.id, role: user.role }, 'votre_secret_jwt', { expiresIn: '1h' });
+                res.json({ token, role: user.role });
             });
-          }
-        );
-      });
+        }
+    );
+});
+
+// Nouvelle route pour ajouter un produit
+app.post('/produit', authenticateToken, (req, res) => {
+    const { nom, categorie, images, prix, quantite, description } = req.body;
+    const userId = req.user.userId;
+
+    connection.query(
+        'INSERT INTO produit (nom, categorie, images, prix, quantite, description, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [nom, categorie, images, prix, quantite, description, userId],
+        (err, result) => {
+            if (err) {
+                console.error('Error adding product:', err);
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.status(201).json({ message: 'Produit ajouté avec succès', productId: result.insertId });
+        }
+    );
+});
 
 // Démarrage du serveur
 app.listen(port, () => {
