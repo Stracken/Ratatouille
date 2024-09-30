@@ -65,12 +65,6 @@ export default function App() {
   );
 }
 
-//   return (
-//     <View style={styles.container}>
-//       <MyContext.Provider value={{/* vos valeurs */}}>
-//       <MainApp></MainApp>
-//     </MyContext.Provider>
-//     </View>
 
 const styles = StyleSheet.create({
   container: {

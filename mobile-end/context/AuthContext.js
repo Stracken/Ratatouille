@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signIn, signUp, getUserData } from "../api/api";
+import axios from "axios";
 
 const AuthContext = createContext();
 
@@ -75,6 +76,43 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
+  
+const useProducts = (userId) => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchProducts = async () => {
+    if (!userId) {
+      setError('UserId non défini');
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/products/${userId}`);
+      if (response.data.products) {
+        setProducts(response.data.products);
+      } else {
+        setProducts([]);
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Erreur lors de la récupération des produits');
+      console.error('Erreur lors de la récupération des produits:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [userId]);
+
+  return { products, loading, error, refetch: fetchProducts };
+};
+
+
   const clearError = () => setError(null);
 
   return (
@@ -88,6 +126,7 @@ export const AuthProvider = ({ children }) => {
         signOut,
         signUpUser,
         clearError,
+        useProducts
       }}
     >
       {children}

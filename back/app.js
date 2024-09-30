@@ -3,7 +3,6 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const authenticateToken = require('./middleware/auth');
 const app = express();
 const port = 3001; // Changé à 3001 pour éviter les conflits avec Next.js
 
@@ -42,45 +41,51 @@ app.use(express.json());
 
 
 // Routes
-app.get('/test', (req,res)=>{
-  console.log('testendpointreached');
-  res.status(200).json({message: 'Test endpoint reached'});
-});
+app.get('/products/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log('Received product request for user:', userId);
 
-app.get('/api/utilisateurs', (req, res) => {
-    pool.query('SELECT * FROM utilisateurs', (err, results) => {
+    if (!userId) {
+      return res.status(400).json({ error: 'UserId est requis' });
+    }
+
+    pool.query(
+      'SELECT * FROM produit WHERE user_id = ?',
+      [userId],
+      (err, results) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-            return;
+          console.error("Erreur lors de la récupération des produits:", err);
+          return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
         }
-        res.json(results);
-    });
-});
 
-app.post('/api/utilisateurs', (req, res) => {
-    const { nom, email } = req.body;
-    pool.query('INSERT INTO utilisateurs (nom, email) VALUES (?, ?)', [nom, email], (err, result) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.status(201).json({ id: result.insertId, nom, email });
-    });
+        res.status(200).json({
+          message: results.length > 0 ? 'Produits récupérés avec succès' : 'Aucun produit trouvé pour cet utilisateur',
+          products: results
+        });
+      }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la récupération des produits:", error);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
 });
-
 
 ////////////                           INSCRIPTION /////
 
 app.post('/signup', async (req, res) => {
   try {
-      const { firstName, lastName, email, password, telephone, address, ville, postalCode } = req.body;
+      const { firstName, lastName, email, password, telephone, address, ville, postalCode, role, raisonSociale } = req.body;
       
       // Log des données reçues (attention à ne pas logger les mots de passe en production)
-      console.log('Received signup request:', { firstName, lastName, email, telephone, address, ville, postalCode });
+      console.log('Received signup request:', { firstName, lastName, email, telephone, address, ville, postalCode, role, raisonSociale });
 
       // Vérification que tous les champs nécessaires sont présents
-      if (!firstName || !lastName || !email || !password || !telephone || !address || !ville || !postalCode) {
+      if (!firstName || !lastName || !email || !password || !telephone || !address || !ville || !postalCode || !role) {
           return res.status(400).json({ error: 'Tous les champs sont requis' });
+      }
+      if (role === 'vendeur' && (!raisonSociale)) {
+        return res.status(400).json({ error: 'Raison sociale et image sont requis pour les vendeurs' });
       }
 
       // Hachage du mot de passe
@@ -88,8 +93,10 @@ app.post('/signup', async (req, res) => {
 
       // Insertion dans la base de données
       pool.query(
-          'INSERT INTO user (prenom, nom, email, mot_de_passe, telephone, adresse, ville, code_postal) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [firstName, lastName, email, hashedPassword, telephone, address, ville, postalCode],
+' INSERT INTO user (prenom, nom, email, mot_de_passe, telephone, adresse, ville, code_postal, role, raison_sociale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+
+[firstName, lastName, email, hashedPassword, telephone, address, ville, postalCode, role, raisonSociale],
+
           (err, result) => {
               if (err) {
                   console.error("Erreur durant l'inscription:", err);
@@ -102,12 +109,12 @@ app.post('/signup', async (req, res) => {
               }
 
               const userId = result.insertId;
-              const token = jwt.sign({ userId }, 'votre_secret_jwt', { expiresIn: '127h' });
+              const token = jwt.sign({ userId }, 'votre_secret_jwt', { expiresIn: '24h' });
               
               res.status(201).json({
                   message: 'Utilisateur créé avec succès',
                   token,
-                  user: { id: userId, email, firstName, lastName }
+                  user: { id: userId, email, firstName, lastName, role, raisonSociale }
               });
           }
       );
@@ -179,13 +186,143 @@ app.post('/signup', async (req, res) => {
                   address: user.adresse,
                   telephone: user.telephone,
                   postalCode: user.code_postal,
-                  ville: user.ville
+                  ville: user.ville,
+                  role:user.role,
+                  raisonSociale:user.raisonSociale
                 }
                });
             });
           }
         );
       });
+
+
+
+
+////////////                       CRUD PRODUIT/////
+
+// app.get('/products/:userId', async (req, res) => {
+//   const userId = req.params.userId;
+//   console.log('userId get produits', userId);
+  
+//   try {
+//     const products = await getProductsForUser(userId);
+//     if (products.length === 0) {
+//       return res.status(404).json({ message: 'Aucun produit trouvé' });
+//     }
+//     res.json(products);
+//   } catch (error) {
+//     console.error('Erreur lors de la récupération des produits (get):', error);
+//     res.status(500).json({ message: 'Erreur serveur' });
+//   }
+// });
+
+// const getProductsForUser = async (userId) => {
+//   const query = `
+//     SELECT *
+//     FROM produit
+//     WHERE user_id = ?
+//   `;
+  
+//   return new Promise((resolve, reject) => {
+//     pool.query(query, [userId], (error, results) => {
+//       if (error) {
+//         reject(error);
+//       } else {
+//         resolve(results);
+//       }
+//     });
+//   });
+// };
+app.get('/products/:userId', async (req, res) => {
+  try {
+    
+    const userId = req.params.userId;
+    
+    // Log de la requête reçue
+    console.log('Received product request for user:', userId);
+
+    // Vérification que l'userId est présent
+    if (!userId) {
+      return res.status(400).json({ error: 'UserId est requis' });
+    }
+
+    // Récupération des produits depuis la base de données
+    pool.query(
+      'SELECT * FROM produit WHERE user_id = ?',
+      [userId],
+      (err, results) => {
+        if (err) {
+          console.error("Erreur lors de la récupération des produits:", err);
+          return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
+        }
+
+        // Si aucun produit n'est trouvé, renvoyer un message approprié
+        if (results.length === 0) {
+          return res.status(404).json({ message: 'Aucun produit trouvé pour cet utilisateur' });
+        }
+
+        // Renvoyer les produits trouvés
+        res.status(200).json({
+          message: 'Produits récupérés avec succès',
+          products: results
+        });
+      }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la récupération des produits:", error);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+// Add a new product
+app.post('/products', async (req, res) => {
+  const { user_id, categorie, image, prix, quantite, description } = req.body;
+  const query = 'INSERT INTO produit (user_id, categorie, image, prix, quantite, description, date_creation) VALUES (?, ?, ?, ?, ?, ?, NOW())';
+  
+  pool.query(query, [user_id, categorie, image, prix, quantite, description], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de l\'ajout du produit (post):', error);
+      return res.status(500).json({ message: 'Erreur serveur' });
+    }
+    res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
+  });
+});
+
+// Update a product
+app.put('/products/:id', async (req, res) => {
+  const productId = req.params.id;
+  const { categorie, image, prix, quantite, description } = req.body;
+  const query = 'UPDATE produit SET categorie = ?, image = ?, prix = ?, quantite = ?, description = ? WHERE id = ?';
+  
+  pool.query(query, [categorie, image, prix, quantite, description, productId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la mise à jour du produit(put):', error);
+      return res.status(500).json({ message: 'Erreur serveur' });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: 'Produit non trouvé' });
+    }
+    res.json({ message: 'Produit mis à jour avec succès' });
+  });
+});
+
+// Delete a product
+app.delete('/products/:id', async (req, res) => {
+  const productId = req.params.id;
+  const query = 'DELETE FROM produit WHERE id = ?';
+  
+  pool.query(query, [productId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la suppression du produit:', error);
+      return res.status(500).json({ message: 'Erreur serveur' });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: 'Produit non trouvé' });
+    }
+    res.json({ message: 'Produit supprimé avec succès' });
+  });
+});
+
 
 
 

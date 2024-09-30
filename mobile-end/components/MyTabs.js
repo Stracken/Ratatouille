@@ -17,6 +17,8 @@ import ContactUsScreen from "../screens/ContactUsScreen";
 import MentionsLegales from "../screens/MentionsLegales";
 import CookiesPage from "./CookiesPage";
 import ProductDetails from "../screens/ProductDetails"; // Assurez-vous d'avoir ce composant
+import { useAuth } from "../context/AuthContext";
+import ProductManagementScreen from '../screens/ProduitManagementScreen'
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -29,9 +31,9 @@ const HomeStack = () => (
   </Stack.Navigator>
 );
 
-const CategoryStack = () => (
+const ProductManagementStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
-    <Stack.Screen name="CategoryMain" component={Category} options={{ headerShown: false }} />
+    <Stack.Screen name="ProductManagementScreen" component={ProductManagementScreen} options={{ headerShown: false }} />
   </Stack.Navigator>
 );
 
@@ -84,7 +86,8 @@ const screenOptions = ({ navigation }) => ({
 });
 function MyTabs() {
   const { cartItemsCount } = useCart();
-
+const {user} = useAuth();
+console.log('User Role:', user);
   return (
     <Tab.Navigator
       screenOptions={{
@@ -105,16 +108,18 @@ function MyTabs() {
           ),
         }}
       />
-      <Tab.Screen
-        name="Categories"
-        component={CategoryStack}
-        options={{
-          tabBarLabel: "Categories",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="albums" size={20} color={color} />
-          ),
-        }}
-      />
+      {user?.role === 'vendeur' && (
+          <Tab.Screen 
+          name="ProduitManagement" 
+          component={ProductManagementStack}
+          options={{
+            tabBarLabel: "Gestion produitss",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="nutrition" size={20} color={color} />
+            ),
+           }}
+          />
+        )}
       <Tab.Screen
         name="Produits"
         component={ProductsStack}

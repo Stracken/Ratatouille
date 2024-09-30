@@ -24,6 +24,8 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
   // const [companyName, setCompanyName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [postalCode, setPostalCode] = useState("");
+  const [role, setRole] = useState("client");
+  const [raisonSociale, setRaisonSociale] = useState("");
   const [error, setError] = useState(null);
   const validateForm = () => {
     if (
@@ -34,7 +36,8 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
       !ville ||
       !password ||
       !postalCode ||
-      !address
+      !address ||
+      !role 
     ) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires");
       return false;
@@ -43,6 +46,10 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
     //   Alert.alert("Erreur", "Veuillez entrer la raison sociale");
     //   return false;
     // }
+    if (role === "vendeur" && !raisonSociale) {
+      Alert.alert("Erreur", "Raison sociale est requis pour les vendeurs");
+      return false;
+    }
     if (!/\S+@\S+\.\S+/.test(email)) {
       Alert.alert("Erreur", "Veuillez entrer une adresse email valide");
       return false;
@@ -75,12 +82,12 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
         lastName,
         email,
         telephone,
-        // userType,
         postalCode,
         password,
         address,
-        ville
-        // companyName: userType === "producteur" ? companyName : undefined,
+        ville,
+        role,
+        ...(role === "vendeur" && { raisonSociale }),
       };
       const response = await signUp(userData);
       Alert.alert("Succès", "Inscription réussie !", [
@@ -106,7 +113,32 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Inscription</Text>
-
+      <View style={styles.radioContainer}>
+        <Text style={styles.labelText}>Type d'utilisateur :</Text>
+        <TouchableOpacity
+          style={[styles.radioButton, role === "client" && styles.radioButtonSelected]}
+          onPress={() => {setRole("client");
+            setRaisonSociale(""); // Réinitialiser raisonSociale
+          }}
+        >
+          <Text style={styles.radioButtonText}>Client</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.radioButton, role === "vendeur" && styles.radioButtonSelected]}
+          onPress={() => setRole("vendeur")}
+        >
+          <Text style={styles.radioButtonText}>Vendeur</Text>
+        </TouchableOpacity>
+      </View>
+      {role === "vendeur" && (
+        
+          <TextInput
+            style={styles.input}
+            placeholder="Raison sociale"
+            value={raisonSociale}
+            onChangeText={setRaisonSociale}
+            placeholderTextColor={Colors.white}
+          />)}
       <TextInput
         style={styles.input}
         placeholder="Prénom"
@@ -140,36 +172,6 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
         keyboardType="phone-pad"
         placeholderTextColor={Colors.white}
       />
-
-      {/* <View style={styles.radioContainer}>
-        <Text
-          style={{
-            color: Colors.white,
-            fontWeight: "bold",
-            fontStyle: "italic",
-          }}
-        >
-          Type d'utilisateur :
-        </Text>
-        <TouchableOpacity
-          style={[
-            styles.radioButton,
-            userType === "producteur" && styles.radioButtonSelected,
-          ]}
-          onPress={() => setUserType("producteur")}
-        >
-          <Text style={{ color: Colors.white }}>Producteur</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.radioButton,
-            userType === "particulier" && styles.radioButtonSelected,
-          ]}
-          onPress={() => setUserType("particulier")}
-        >
-          <Text style={{ color: Colors.white }}>Particulier</Text>
-        </TouchableOpacity>
-      </View> */}
 
       <TextInput
         style={styles.input}
@@ -207,15 +209,7 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      {/* {userType === "producteur" && (
-        <TextInput
-          style={styles.input}
-          placeholder="Raison sociale"
-          value={companyName}
-          onChangeText={setCompanyName}
-          placeholderTextColor={Colors.white}
-        />
-      )} */}
+  
       {isLoading ? (
         <ActivityIndicator size="large" color={Colors.danger} />
       ) : (

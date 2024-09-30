@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
