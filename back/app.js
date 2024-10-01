@@ -5,6 +5,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const app = express();
 const port = 3001; // Changé à 3001 pour éviter les conflits avec Next.js
+const multer = require('multer');
+const upload = multer();
+
 
 // Configuration de la connexion à la base de données
 const pool = mysql.createConnection({
@@ -196,44 +199,39 @@ app.post('/signup', async (req, res) => {
         );
       });
 
+   // Dans votre fichier principal d'application (par exemple, app.js ou server.js)
+
+app.get('/product', async (req, res) => {
+  try {
+    // Récupération de tous les produits depuis la base de données
+    pool.query(
+      'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit ORDER BY date_creation DESC',
+      (err, results) => {
+        if (err) {
+          console.error("Erreur lors de la récupération des produits:", err);
+          return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
+        }
+        // Convertir les images en Base64
+        const productsWithImages = results.map(product => ({
+          ...product,
+          images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
+        }));
+        // Renvoyer tous les produits trouvés
+        res.status(200).json({
+          message: 'Produits récupérés avec succès',
+          products:productsWithImages
+        });
+      }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la récupération des produits:", error);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+////////////                       CRUD PRODUIT  MANAGEMENT/////
 
 
-
-////////////                       CRUD PRODUIT/////
-
-// app.get('/products/:userId', async (req, res) => {
-//   const userId = req.params.userId;
-//   console.log('userId get produits', userId);
-  
-//   try {
-//     const products = await getProductsForUser(userId);
-//     if (products.length === 0) {
-//       return res.status(404).json({ message: 'Aucun produit trouvé' });
-//     }
-//     res.json(products);
-//   } catch (error) {
-//     console.error('Erreur lors de la récupération des produits (get):', error);
-//     res.status(500).json({ message: 'Erreur serveur' });
-//   }
-// });
-
-// const getProductsForUser = async (userId) => {
-//   const query = `
-//     SELECT *
-//     FROM produit
-//     WHERE user_id = ?
-//   `;
-  
-//   return new Promise((resolve, reject) => {
-//     pool.query(query, [userId], (error, results) => {
-//       if (error) {
-//         reject(error);
-//       } else {
-//         resolve(results);
-//       }
-//     });
-//   });
-// };
 app.get('/products/:userId', async (req, res) => {
   try {
     
@@ -262,10 +260,17 @@ app.get('/products/:userId', async (req, res) => {
           return res.status(404).json({ message: 'Aucun produit trouvé pour cet utilisateur' });
         }
 
+        // Convertir les images en Base64
+        const productsWithImages = results.map(product => ({
+          ...product,
+          images: product.images 
+            ? `data:image/jpeg;base64,${product.images.toString('base64')}` 
+            : null,
+        }));
         // Renvoyer les produits trouvés
         res.status(200).json({
           message: 'Produits récupérés avec succès',
-          products: results
+          products: productsWithImages
         });
       }
     );
@@ -275,29 +280,64 @@ app.get('/products/:userId', async (req, res) => {
   }
 });
 // Add a new product
-app.post('/products', async (req, res) => {
-  const { user_id, categorie, image, prix, quantite, description } = req.body;
-  const query = 'INSERT INTO produit (user_id, categorie, image, prix, quantite, description, date_creation) VALUES (?, ?, ?, ?, ?, ?, NOW())';
+
+app.post('/products', upload.single('images'), async (req, res) => {
+  const {nom, categorie, prix, quantite, description } = req.body;
+  const user_id = req.body.user_id; // Assurez-vous que user_id est bien envoyé dans le corps de la requête
+
+  // Vérification des champs requis
+  if (!user_id || !nom || !categorie || !prix || !quantite || !description) {
+    return res.status(400).json({ message: 'Tous les champs requis doivent être remplis' });
+  }
+
+  // Vérification de l'image
+  if (!req.file) {
+    return res.status(400).json({ message: 'L\'image est requise' });
+  }
+
+  const images = req.file.buffer;
   
-  pool.query(query, [user_id, categorie, image, prix, quantite, description], (error, results) => {
+
+  const query = 'INSERT INTO produit (user_id, nom, categorie, images, prix, quantite, description, date_creation) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())';
+  
+    pool.query(query, [user_id, nom, categorie, images, prix, quantite, description], (error, results) => {
     if (error) {
-      console.error('Erreur lors de l\'ajout du produit (post):', error);
-      return res.status(500).json({ message: 'Erreur serveur' });
+      console.error('Erreur lors de l\'ajout du produit:', error);
+      return res.status(500).json({ message: 'Erreur serveur', error: error.message });
     }
     res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
   });
 });
+// app.post('/products', async (req, res) => {
+//   const { user_id, categorie, image, prix, quantite, description } = req.body;
+//   const query = 'INSERT INTO produit (user_id, categorie, image, prix, quantite, description, date_creation) VALUES (?, ?, ?, ?, ?, ?, NOW())';
+  
+//   pool.query(query, [user_id, categorie, image, prix, quantite, description], (error, results) => {
+//     if (error) {
+//       console.error('Erreur lors de l\'ajout du produit (post):', error);
+//       return res.status(500).json({ message: 'Erreur serveur' });
+//     }
+//     res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
+//   });
+// });
 
 // Update a product
-app.put('/products/:id', async (req, res) => {
+app.put('/products/:id',  upload.single('images'), async (req, res) => {
   const productId = req.params.id;
-  const { categorie, image, prix, quantite, description } = req.body;
-  const query = 'UPDATE produit SET categorie = ?, image = ?, prix = ?, quantite = ?, description = ? WHERE id = ?';
+  const { categorie, prix, quantite, description } = req.body;
+  const images = req.file ? req.file.buffer : null;
+  const query = images
+  ? 'UPDATE produit SET categorie = ?, images = ?, prix = ?, quantite = ?, description = ? WHERE id = ?'
+  : 'UPDATE produit SET categorie = ?, prix = ?, quantite = ?, description = ? WHERE id = ?';
   
-  pool.query(query, [categorie, image, prix, quantite, description, productId], (error, results) => {
+  const params = images
+    ? [categorie, images, prix, quantite, description, productId]
+    : [categorie, prix, quantite, description, productId];
+
+  pool.query(query, params, (error, results) => {
     if (error) {
       console.error('Erreur lors de la mise à jour du produit(put):', error);
-      return res.status(500).json({ message: 'Erreur serveur' });
+      return res.status(500).json({ message: 'Erreur serveur', error:error.message });
     }
     if (results.affectedRows === 0) {
       return res.status(404).json({ message: 'Produit non trouvé' });
