@@ -9,7 +9,7 @@ import ButtonComponent from './ButtonComponent'
 import { useAuth } from '../context/AuthContext'
 
 const Home = () => {
-  const { signOut } = useAuth();
+  const { signOut} = useAuth();
   
 
   
@@ -18,22 +18,19 @@ const Home = () => {
       <View style={styles.homeWebView}>
         <WebviewComponent />
       </View>
-      <View  style={styles.homeTitles}>
+      <View style={styles.homeTitles}>
         <Text style={styles.homeTitleText}>Catégories</Text>
       </View>
       <View style={styles.homeCarousel}>
         <Carousel/>
       </View>
-      <View  style={styles.homeTitles}>
+      <View style={styles.homeTitles}>
         <Text style={styles.homeTitleText}>Nouveaux produits</Text>
       </View>
       <View style={styles.productsSection}>
         <HomeProducts />
       </View>
-
-      <Text style={styles.additionalText}>
-        iatur nulla reprehenderit. Assumenda dolorem vero odit. Accusamus fugiat dolores esse voluptatum qui cupiditate illo corporis necessitatibus, liberm rem error sunt porro.
-      </Text>
+     
       
      <ButtonComponent
           title="Déconnexion"

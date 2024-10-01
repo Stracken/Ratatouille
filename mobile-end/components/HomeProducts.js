@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import ProductCard from './ProductCard';
 import { useCart } from './CartContext';
-import { categories } from './Category';
-import _ from 'lodash';
+import axios from 'axios';
+import { API_URL } from '../config';
 
 const { width } = Dimensions.get('window');
 
@@ -12,26 +12,51 @@ const HomeProducts = () => {
   const { cart, addToCart, updateCartItemQuantity } = useCart();
 
   useEffect(() => {
-    const allProducts = categories.flatMap(category => category.products);
-    const shuffledProducts = _.shuffle(allProducts);
-    setProducts(shuffledProducts.slice(0, 6)); // Prend 6 produits au hasard
+    fetchRecentProducts();
   }, []);
+
+  const fetchRecentProducts = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/product`);
+      // Prend les 6 produits les plus récents
+      setProducts(response.data.products.slice(0, 6));
+    } catch (error) {
+      console.error('Erreur lors de la récupération des produits récents:', error);
+    }
+  };
 
   const handleAddToCart = (product, quantity) => {
     addToCart(product, quantity);
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.productWrapper}>
-      <ProductCard 
-        item={item} 
-        addToCart={handleAddToCart}
-        updateCartItemQuantity={updateCartItemQuantity}
-        cartQuantity={cart.find(cartItem => cartItem.id === item.id)?.selectedQuantity || 0}
-      />
-    </View>
-  );
-return (
+  const renderItem = ({ item }) => {
+    const imageUri = item.images;
+
+    // Vérifiez si l'URI est valide
+    if (typeof imageUri !== 'string') {
+      console.error('URI d\'image invalide:', imageUri);
+      return null; // ou une image par défaut
+    }
+  
+    return (
+      <View style={styles.productWrapper}>
+        <ProductCard 
+          item={{
+            id: item.id,
+            title: item.nom,
+            price: item.prix,
+            quantity: item.quantite,
+            images: item.images // Assurez-vous que c'est une chaîne
+          }}
+          addToCart={handleAddToCart}
+          updateCartItemQuantity={updateCartItemQuantity}
+          cartQuantity={cart.find(cartItem => cartItem.id === item.id)?.selectedQuantity || 0}
+        />
+      </View>
+    );
+};
+
+  return (
     <View style={styles.container}>
       <FlatList
         data={products}
@@ -49,17 +74,16 @@ return (
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    alignItems: 'center', // Centre le contenu horizontalement
+    alignItems: 'center',
   },
   productList: {
     width: '100%',
-    justifyContent: 'space-between', // Distribue l'espace entre les colonnes
-    gap:10
+    justifyContent: 'space-between',
+    gap: 10
   },
   productWrapper: {
-    width: (width - 40) / 2, // 40 pour tenir compte du padding du container et de l'espace entre les éléments
+    width: (width - 40) / 2,
     marginBottom: 10,
-    
   },
 });
 

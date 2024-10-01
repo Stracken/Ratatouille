@@ -8,7 +8,7 @@ const ProductDetails = ({ route }) => {
   return (
     <ScrollView style={styles.container}>
         <View style={styles.cardProductDetail}>
-            <Image source={product.image} style={styles.image} />
+            <Image source={{ uri: product.images }} style={styles.image} />
             <Text style={styles.title}>{product.title}</Text>
             <Text style={styles.price}>Prix: {product.price}€</Text>
             <Text style={styles.quantity}>Quantité disponible: {product.quantity}</Text>
@@ -21,11 +21,20 @@ const ProductDetails = ({ route }) => {
         <View style={styles.producerInfo}>
             <Text style={styles.producerTitle}>Information sur le producteur</Text>
             {product.userProducteurId && product.userProducteurId.length > 0 && (
-    <>
-      <Text>Nom du producteur: {product.userProducteurId[0].name}</Text>
+    <View>
+      {/* {product.user_lastName && product.user_firstName && (
+            <View>
+              <Text>Nom du producteur: {product.user_lastName} {product.user_firstName}</Text>
+              {/* Ajoutez d'autres informations sur le producteur si disponibles */}
+              
+            {/* </View>
+          )} */} 
+   <Text>Nom du producteur: {product.user_id[0].firstName}</Text>
       <Text>Information: {product.userProducteurId[0].producerInfo}</Text>
       <Text>Titre: {product.userProducteurId[0].producerTitle}</Text>
-    </>
+    </View>
+   
+    
   )}
         </View>
         </View>

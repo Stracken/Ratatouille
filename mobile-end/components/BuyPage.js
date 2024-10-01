@@ -6,10 +6,14 @@ import Colors from '../constants/Colors';
 const ArticleItem = ({ item, onQuantityChange, onRemove }) => {
   return (
     <View style={styles.articleContainer}>
-      <Image source={item.image} style={styles.image} />
+      <Image source={{ uri: item.images }} style={styles.image} />
       <View style={styles.articleInfo}>
         <Text style={styles.articleName}>{item.title}</Text>
-        <Text style={styles.price}>Prix: {item.price.toFixed(2)}€</Text>
+        <Text style={styles.price}>Prix: {parseFloat(item.price).toFixed(2)}€</Text>
+        {/* parseFloat() est une fonction JavaScript qui convertit une chaîne de caractères en un nombre à virgule flottante.
+Cette étape est nécessaire car parfois, lors de la transmission de données depuis une API ou une base de données, les nombres peuvent être convertis en chaînes de caractères.
+Si item.prix est déjà un nombre, parseFloat() le retournera tel quel. */}
+
         <View style={styles.quantityContainer}>
           <TouchableOpacity onPress={() => onQuantityChange(item.id, Math.max(1, item.selectedQuantity - 1))} style={styles.quantityButton}>
             <Text style={styles.quantityButtonText}>-</Text>

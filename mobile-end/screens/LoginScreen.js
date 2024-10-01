@@ -57,17 +57,6 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  const getTest = async () => {
-    try {
-      const response = await fetch(`${API_URL}/test`);
-      const data = await response.json();
-      console.log(data);
-      console.log("testsuccessfull");
-    } catch (error) {
-      console.error("Error testing endpoint", error);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <TextInput
@@ -89,7 +78,7 @@ const LoginScreen = ({ navigation }) => {
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
       <TouchableOpacity
-        style={styles.button}
+        style={styles.SignLogButton}
         onPress={handleLogin}
         disabled={isLoading}
       >
@@ -99,14 +88,11 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Se connecter</Text>
         )}
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("signup")}>
-        <Text style={styles.linkText}>Pas de compte ? S'inscrire</Text>
+      <TouchableOpacity style={styles.SignLogButton} onPress={() => navigation.navigate("signup")}>
+        <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
+      <TouchableOpacity style={styles.passwordLink} onPress={() => navigation.navigate("ForgotPassword")}>
         <Text style={styles.forgot}>Forgot Password?</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={getTest}>
-        <Text style={styles.forgot}>Test endpoint</Text>
       </TouchableOpacity>
     </View>
   );
@@ -136,6 +122,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     margin: 5,
   },
+  buttonText:{
+    color:Colors.white
+  },
+  SignLogButton: {
+    backgroundColor: 'darkgreen',
+    padding: 10,
+    borderRadius: 5,
+    width:180,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  passwordLink:{
+    padding: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  }
 });
 
 export default LoginScreen;

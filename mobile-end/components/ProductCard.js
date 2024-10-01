@@ -34,7 +34,7 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
   
 <View style={styles.card}>
       <TouchableOpacity onPress={navigateToProductDetails} accessible={true} accessibilityLabel={`Voir les détails de ${item.title}`} accessibilityHint="Appuyez pour voir les détails complets du produit">
-        <Image source={item.image} style={styles.productImage} />
+      <Image source={{ uri: item.images }} style={styles.productImage} />
         <Text style={styles.productTitle}>{item.title}</Text>
       </TouchableOpacity>
       <Text>Prix: {item.price}€</Text>
@@ -63,8 +63,8 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
       accessibilityLabel="Bouton de validation"
       accessibilityHint="Appuyez pour valider ou mettre a jour la mise au panier du produit"
       accessibilityRole="button" 
-        style={styles.addButton} 
-        onPress={handleAddToCart}
+      style={styles.addButton} 
+      onPress={handleAddToCart}
       >
         <Text style={styles.textAddBuy}>{cartQuantity > 0 ? 'Mettre à jour le panier' : 'Ajouter au panier'}</Text>
       </TouchableOpacity>

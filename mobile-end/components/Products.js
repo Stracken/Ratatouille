@@ -4,8 +4,10 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import ProductCard from './ProductCard';
 import { useCart } from './CartContext';
-import { categories } from './Category';
 import Colors from '../constants/Colors';
+import axios from 'axios';
+import { API_URL } from '../config';
+
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -13,54 +15,50 @@ const Products = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [categoryFilter, setCategoryFilter] = useState('Tous les produits');
   const navigation = useNavigation();
-  const route = useRoute();
   const { cart, addToCart, updateCartItemQuantity } = useCart();
   const ALL_CATEGORIES = 'Tous les produits';
 
+
   useEffect(() => {
-    console.log("Selected category from route:", route.params?.selectedCategory);
-    const allProducts = categories.flatMap(category => category.products);
-    setProducts(allProducts);
+    fetchProduct();
+  }, []);
 
-    const selectedCategory = route.params?.selectedCategory;
-    if (selectedCategory && selectedCategory !== ALL_CATEGORIES) {
-        filterByCategory(selectedCategory);
-        setCategoryFilter(selectedCategory);
-    } else {
-        setFilteredProducts(allProducts);
-        setCategoryFilter(ALL_CATEGORIES);
+
+
+  
+  const fetchProduct = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/product`);
+      setProducts(response.data.products);
+      setFilteredProducts(response.data.products);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des produits:', error);
     }
-// assurer la reinitialisation de l'etat de products quand on quitte l'ecran
-    return () => {
-        setFilteredProducts([]);
-        setCategoryFilter(ALL_CATEGORIES);
-    };
-}, [route.params?.selectedCategory]);
-
-
+  };
 
   const sortProducts = (order) => {
     const sorted = [...filteredProducts].sort((a, b) => {
-      return order === 'asc' ? a.price - b.price : b.price - a.price;
+      return order === 'asc' ? a.prix - b.prix : b.prix - a.prix;
     });
     setFilteredProducts(sorted);
     setSortOrder(order);
   };
 
- const filterByCategory = (category) => {
-  console.log("Filtering by category:", category);
+  const filterByCategory = (category) => {
     if (category === ALL_CATEGORIES) {
-        setFilteredProducts(products);
+      setFilteredProducts(products);
     } else {
-        const categoryProducts = categories.find(cat => cat.title === category)?.products || [];
-        setFilteredProducts(categoryProducts);
+      const filtered = products.filter(product => product.categorie === category);
+      setFilteredProducts(filtered);
     }
     setCategoryFilter(category);
-};
+  };
 
   const handleAddToCart = (product, quantity) => {
     addToCart(product, quantity);
   };
+
+  const categories = ['fruits', 'poissons', 'legumes', 'produits_sucres', 'produits_laitiers', 'cereales', 'viandes'];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -84,7 +82,7 @@ const Products = () => {
         >
           <Picker.Item color={Colors.danger} label={ALL_CATEGORIES} value={ALL_CATEGORIES} />
           {categories.map((category) => (
-            <Picker.Item key={category.id} label={category.title} value={category.title} style={styles.pickerItemCategory} />
+            <Picker.Item key={category} label={category} value={category} style={styles.pickerItemCategory} />
           ))}
         </Picker>
       </View>
@@ -92,7 +90,13 @@ const Products = () => {
         data={filteredProducts}
         renderItem={({ item }) => (
           <ProductCard 
-            item={item} 
+            item={{
+              id: item.id,
+              title: item.nom,
+              price: item.prix,
+              quantity: item.quantite,
+              images: item.images // Assurez-vous que l'URL de l'image est correcte
+            }}
             addToCart={handleAddToCart}
             updateCartItemQuantity={updateCartItemQuantity}
             cartQuantity={cart.find(cartItem => cartItem.id === item.id)?.selectedQuantity || 0}
@@ -113,6 +117,7 @@ const Products = () => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
