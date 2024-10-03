@@ -2,7 +2,17 @@ import React from 'react';
 import { useAuth } from '@/outils/AuthContext';
 
 export default function AuthStatus() {
-  const { user, logout } = useAuth();
+  console.log('AuthStatus rendering');
+  
+  const auth = useAuth();
+  console.log('AuthStatus auth:', auth);
+
+  if (!auth) {
+    return <p>Chargement...</p>;
+  }
+
+  const { user, logout } = auth;
+  console.log('AuthStatus user:', user);
 
   if (user) {
     return (

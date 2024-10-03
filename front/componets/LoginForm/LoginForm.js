@@ -1,15 +1,23 @@
-import { useState } from 'react';
-import { login } from '@/outils/api';
+"use client";
+import { useState, useEffect } from 'react';
+import { login as apiLogin } from '@/outils/api';
 import { useAuth } from '@/outils/AuthContext';
 import Link from 'next/link';
-import { AuthProvider } from '@/outils/AuthContext';
 
-export default function LoginForm({ Component, pageProps }) {
+export default function LoginForm() {
+  console.log('LoginForm rendering');
+
   const [credentials, setCredentials] = useState({
     email: '',
     password: ''
   });
-  const { login: authLogin } = useAuth();
+
+  const auth = useAuth();
+  console.log('Auth in LoginForm:', auth);
+
+  useEffect(() => {
+    console.log('LoginForm useEffect, auth:', auth);
+  }, [auth]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,24 +30,31 @@ export default function LoginForm({ Component, pageProps }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await login(credentials);
-      authLogin(data.token, data.role);
-      alert('Connexion réussie !');
-      // Réinitialiser le formulaire après une connexion réussie
-      setCredentials({
-        email: '',
-        password: ''
-      });
+      console.log('Attempting login with credentials:', credentials);
+      const { data } = await apiLogin(credentials);
+      console.log('Login response:', data);
+      if (auth && auth.login) {
+        auth.login(data.token, data.role);
+        alert('Connexion réussie !');
+        setCredentials({
+          email: '',
+          password: ''
+        });
+      } else {
+        console.error('Auth or auth.login is undefined');
+      }
     } catch (error) {
+      console.error('Login error:', error);
       alert('Erreur de connexion : ' + error.message);
     }
   };
 
+  if (!auth) {
+    console.log('Auth is not available in LoginForm');
+    return <p>Chargement...</p>;
+  }
+
   return (
-    <>
-    <AuthProvider>
-      <Component {...pageProps} />
-    </AuthProvider>
     <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor="login-email">Email:</label>
@@ -64,8 +79,7 @@ export default function LoginForm({ Component, pageProps }) {
         />
       </div>
       <button type="submit">Se connecter</button>
-      <Link href="/signup"><button>Creer un compte</button></Link>
+      <Link href="/signup"><button type="button">Créer un compte</button></Link>
     </form>
-    </>
   );
 }
