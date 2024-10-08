@@ -373,7 +373,7 @@ body {
     align-items: center;
     
     h1{
-        font-size: 2.5vw;
+        font-size: 1.5vw;
         font-weight: bold;
     }
     h2{
@@ -536,4 +536,96 @@ body {
         width: 7vw;
         height: 7vw;
     }
+}
+button{
+    cursor: pointer;
+}
+.button {
+    max-width: 200px;
+    height: 40px;
+    background-color: #4CAF50!important;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.formulaire{
+    display: flex;
+    flex-direction: column;
+    margin-top: 5%;
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    justify-content: center;
+    align-items: center;
+    h2{
+        font-size: 1.5vw;
+        margin-top: 10px;
+    }
+}
+
+/* Style global du formulaire */
+form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+  /* Style des labels et des inputs */
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+label > span {
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+input[type="tel"] {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style du bouton de soumission */
+button[type="submit"] {
+    width: 100%;
+    height: 40px;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+
+/* Style des erreurs */
+.error {
+    color: red;
+    font-size: 12px;
+    margin-bottom: 10px;
 }
