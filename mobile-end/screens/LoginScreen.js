@@ -9,17 +9,16 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import Colors from "../constants/Colors";
-import { signIn } from "../api/api"; // Importez la fonction signIn de votre fichier API
+import { signIn } from "../api/api"; 
 import tinycolor from "tinycolor2";
 import { API_URL } from "../config";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signInContext } = useAuth(); // Renommez pour éviter la confusion avec la fonction API
+  const { signInContext } = useAuth(); 
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
   const validateForm = () => {
     if (!email || !password) {
       setError("Veuillez remplir tous les champs");

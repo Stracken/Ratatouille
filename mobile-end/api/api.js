@@ -1,5 +1,5 @@
 import { API_URL } from "../config";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export const signUp = async (userData) => {
   try {
@@ -10,14 +10,13 @@ export const signUp = async (userData) => {
       },
       body: JSON.stringify(userData),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Erreur lors de l'inscription");
     }
-    return await response.json();
-    console.log(response)
 
+    return await response.json();
   } catch (error) {
     console.error("Erreur lors de l'inscription:", error);
     throw error;

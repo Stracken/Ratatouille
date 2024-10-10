@@ -10,10 +10,10 @@ const Carousel = () => {
     const categoriesData = {
         'fruits': {title: 'Fruits', image: require('../assets/images/banane.jpg')},
         'poissons': {title: 'Poissons', image: require('../assets/images/saumon.jpg')},
-        'legumes': {title: 'Légumes', image: require('../assets/images/carotte2.jpg')},
-        'produits_sucres': {title: 'Produits Sucrés', image: require('../assets/images/sugarProducts.jpg')},
-        'produits_laitiers': {title: 'Produits Laitiers', image: require('../assets/images/lait.jpg')},
-        'cereales': {title: 'Céréales', image: require('../assets/images/ble.jpg')},
+        'legumes': {title: 'L\u00E9gumes', image: require('../assets/images/carotte2.jpg')},
+        'produits_sucres': {title: 'produits Sucr\u00E9s', image: require('../assets/images/sugarProducts.jpg')},
+        'produits_laitiers': {title: 'produits Laitiers', image: require('../assets/images/lait.jpg')},
+        'cereales': {title: 'C\u00E9r\u00E9ales', image: require('../assets/images/ble.jpg')},
         'viandes': {title: 'Viandes', image: require('../assets/images/steack.jpg')}
     };
 
@@ -23,12 +23,14 @@ const Carousel = () => {
         title: value.title,
         image: value.image
     }));
+console.log(categories);
 
-    const navigateToProducts = (category) => {
+    const navigateToProducts = (categories) => {
+        
         navigation.navigate('Produits', {
             screen: 'Products',
-            params: { selectedCategory: category.id } // Utiliser l'id qui correspond à la valeur de l'enum
-        });
+            params: { selectedCategory: categories.id }
+          });
     };
 
     return (

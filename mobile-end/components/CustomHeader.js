@@ -6,67 +6,66 @@ import { Ionicons } from "@expo/vector-icons";
 import { Keyboard } from "react-native";
 
 const CustomHeader = ({ openModal }) => {
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const animatedHeight = useRef(new Animated.Value(60)).current;
+const [isSearchActive, setIsSearchActive] = useState(false);
+const animatedHeight = useRef(new Animated.Value(60)).current;
 
-  useEffect(() => {
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setIsSearchActive(false);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    Animated.timing(animatedHeight, {
-      toValue: isSearchActive ? 110 : 60,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  }, [isSearchActive]);
-
-  const toggleSearch = () => {
-    setIsSearchActive(!isSearchActive);
+useEffect(() => {
+  const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+    setIsSearchActive(false);
+  });
+  return () => {
+    keyboardDidHideListener.remove();
   };
+}, []);
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <Animated.View style={[styles.container, { height: animatedHeight }]}>
-        <View style={styles.topRow}>
-          <Image
-            source={require("../assets/images/logo.jpg")}
-            style={styles.logo}
+useEffect(() => {
+  Animated.timing(animatedHeight, {
+    toValue: isSearchActive ? 110 : 60,
+    duration: 300,
+    useNativeDriver: false,
+  }).start();
+}, [isSearchActive]);
+
+const toggleSearch = () => {
+  setIsSearchActive(!isSearchActive);
+};
+
+return (
+  <SafeAreaView style={styles.safeArea}>
+    <Animated.View style={[styles.container, { height: animatedHeight }]}>
+      <View style={styles.topRow}>
+        <Image
+          source={require("../assets/images/logo.jpg")}
+          style={styles.logo}
+        />
+        <Text style={styles.title}>TerroTerro</Text>
+        <TouchableOpacity onPress={toggleSearch} style={styles.searchButton}>
+          <Ionicons name="search-outline" size={24} color={Colors.white}  />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.profileIcon} 
+          onPress={openModal}
+          accessible={true}
+          accessibilityLabel="Bouton d'accessibilité"
+          accessibilityHint="Appuyez pour accéder à votre page profil"
+          accessibilityRole="button"
+        >
+          <Ionicons name="person" size={24} color={Colors.white} />
+        </TouchableOpacity>
+      </View>
+      {isSearchActive && (
+        <View style={styles.searchContainer}>
+          <Ionicons name="search-outline" size={20} color={Colors.danger} style={styles.searchIcon} />
+          <TextInput 
+            style={styles.input} 
+            placeholderTextColor={Colors.black} 
+            placeholder="Agriculteurs, Producteurs, ..."
+            autoFocus
           />
-          <Text style={styles.title}>TerroTerro</Text>
-          <TouchableOpacity onPress={toggleSearch} style={styles.searchButton}>
-            <Ionicons name="search-outline" size={24} color={Colors.white}  />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.profileIcon} 
-            onPress={openModal}
-            accessible={true}
-            accessibilityLabel="Bouton d'accessibilité"
-            accessibilityHint="Appuyez pour accéder à votre page profil"
-            accessibilityRole="button"
-          >
-            <Ionicons name="person" size={24} color={Colors.white} />
-          </TouchableOpacity>
         </View>
-        {isSearchActive && (
-          <View style={styles.searchContainer}>
-            <Ionicons name="search-outline" size={20} color={Colors.danger} style={styles.searchIcon} />
-            <TextInput 
-              style={styles.input} 
-              placeholderTextColor={Colors.black} 
-              placeholder="Agriculteurs, Producteurs, ..."
-              autoFocus
-            />
-          </View>
-        )}
-      </Animated.View>
-    </SafeAreaView>
+      )}
+    </Animated.View>
+  </SafeAreaView>
   );
 };
 

@@ -3,10 +3,10 @@ import { Text, TouchableOpacity, View, StyleSheet, Image, ScrollView } from "rea
 import { Alert } from "react-native";
 import Colors from "../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
-import Category from "./Category";
 
 const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) => {
   const [selectedQuantity, setSelectedQuantity] = useState(cartQuantity);
+  const [imageError, setImageError] = useState(false);
   const navigation = useNavigation();
   useEffect(() => {
     setSelectedQuantity(cartQuantity );
@@ -33,8 +33,21 @@ const ProductCard = ({ item, addToCart, updateCartItemQuantity, cartQuantity }) 
   return (
   
 <View style={styles.card}>
-      <TouchableOpacity onPress={navigateToProductDetails} accessible={true} accessibilityLabel={`Voir les détails de ${item.title}`} accessibilityHint="Appuyez pour voir les détails complets du produit">
-      <Image source={{ uri: item.images }} style={styles.productImage} />
+      <TouchableOpacity 
+      onPress={navigateToProductDetails} 
+      accessible={true} 
+      accessibilityLabel={`Voir les détails de ${item.title}`} 
+      accessibilityHint="Appuyez pour voir les détails complets du produit">
+      {!imageError ? (
+        <Image 
+        source={{ uri: item.images }} 
+        style={styles.productImage} 
+        onError={() => setImageError(true)}/>
+      ) : (
+        <View style={[styles.productImage, styles.imagePlaceholder]}>
+          <Text>Image non disponible</Text>
+        </View>
+      )}
         <Text style={styles.productTitle}>{item.title}</Text>
       </TouchableOpacity>
       <Text>Prix: {item.price}€</Text>

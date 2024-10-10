@@ -1,13 +1,13 @@
 import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import MentionsLegales from "../screens/MentionsLegales";
+import MentionsLegales from "../screens/aboutScreens/MentionsLegales";
 import { createStackNavigator } from "@react-navigation/stack";
 import { ScrollView } from "react-native-gesture-handler";
-import AboutUsScreen from "../screens/AboutUsScreen";
-import ContactUsScreen from "../screens/ContactUsScreen";
+import AboutUsScreen from "../screens/aboutScreens/AboutUsScreen";
+import ContactUsScreen from "../screens/aboutScreens/ContactUsScreen";
 import Colors from "../constants/Colors";
 import { Dimensions } from "react-native";
-import CookiesPage from "./CookiesPage";
+import CookiesPage from "../screens/aboutScreens/CookiesPage";
 
 const Stack2 = createStackNavigator();
 const { height } = Dimensions.get("window");
@@ -39,19 +39,17 @@ const About = () => {
         headerTitle: ({ children }) => (
           <Text style={styles.headerTitle}>{children}</Text>
         ),
-        
+
         headerTitleAlign: "center",
         headerTitleContainerStyle: {
           flex: 1, // Permet d'utiliser l'espace disponible
           justifyContent: "center", // Centre verticalement
           flexDirection: "row",
           marginHorizontal: -60, // Permet d'augmenter l'espace disponible,
-          
         },
         headerTitleContainerStyle: {
           justifyContent: "center",
           height: 30,
-          
         },
         headerLeftContainerStyle: {
           alignItems: "center",
@@ -60,20 +58,15 @@ const About = () => {
         headerStyle: {
           backgroundColor: "#F0F0F0",
           borderBottomWidth: 0.5,
-    borderBottomColor: '#000',
+          borderBottomColor: "#000",
         },
         headerTintColor: "black",
-        
-        
       }}
     >
       <Stack2.Screen
         name="About"
         component={AboutScreen}
-        options={{ title: "A Propos",
-        headerShown:false
-         }}
-       
+        options={{ title: "A Propos", headerShown: false }}
       />
       <Stack2.Screen
         name="AboutUs"

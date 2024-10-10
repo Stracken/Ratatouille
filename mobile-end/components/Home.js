@@ -4,7 +4,6 @@ import Colors from "../constants/Colors";
 import WebviewComponent from "./WebviewComponent";
 import Carousel from '../components/Carousel';
 import HomeProducts from './HomeProducts';
-import { useNavigation } from "@react-navigation/native";
 import ButtonComponent from './ButtonComponent'
 import { useAuth } from '../context/AuthContext'
 

@@ -9,14 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.7.7",
+    "js-cookie": "^3.0.5",
+    "latest": "^0.2.0",
     "leaflet": "^1.9.4",
     "next": "^14.1.2",
-    "react": "^18",
+    "react": "^18.3.1",
     "react-dom": "^18",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.26.2",
+    "react-slick": "^0.30.2",
+    "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
+    "@types/react": "^18.3.11",
     "autoprefixer": "^10.0.1",
     "postcss": "^8",
     "tailwindcss": "^3.3.0"

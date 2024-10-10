@@ -13,7 +13,11 @@ const useProducts = (userId) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
+  useEffect(() => {
+    fetchProducts();
+  }, [userId]);
+  
   const fetchProducts = async () => {
     if (!userId) {
       setError('UserId non défini');
@@ -32,9 +36,7 @@ const useProducts = (userId) => {
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [userId]);
+  
 
   return { products, loading, error, refetch: fetchProducts };
 };
@@ -71,31 +73,35 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
         style={styles.input}
         placeholder="Nom du produit"
         value={product.nom}
+        placeholderTextColor="black"
         onChangeText={(text) => handleChange('nom', text)}
       />
 
       <Picker
         selectedValue={product.categorie}
+        style={styles.picker}
+        
         onValueChange={(value) => handleChange('categorie', value)}
       >
-        <Picker.Item label="Choisir une catégorie" value="" />
-        <Picker.Item label="Fruits" value="fruits" />
-        <Picker.Item label="Poissons" value="poissons" />
-        <Picker.Item label="Légumes" value="legumes" />
-        <Picker.Item label="Produits sucrés" value="produits_sucres" />
-        <Picker.Item label="Produits laitiers" value="produits_laitiers" />
-        <Picker.Item label="Céréales" value="cereales" />
-        <Picker.Item label="Viandes" value="viandes" />
+        <Picker.Item style={styles.input} label="Choisir une catégorie" value="" />
+        <Picker.Item style={styles.input} label="Fruits" value="fruits" />
+        <Picker.Item style={styles.input} label="Poissons" value="poissons" />
+        <Picker.Item style={styles.input} label="Légumes" value="legumes" />
+        <Picker.Item style={styles.input} label="Produits sucrés" value="produits_sucres" />
+        <Picker.Item style={styles.input} label="Produits laitiers" value="produits_laitiers" />
+        <Picker.Item style={styles.input} label="Céréales" value="cereales" />
+        <Picker.Item style={styles.input} label="Viandes" value="viandes" />
       </Picker>
       
       <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-        <Text>Choisir une image</Text>
+        <Text style={styles.submitButtonText}>Choisir une image</Text>
       </TouchableOpacity>
       
       <TextInput
         style={styles.input}
         placeholder="Prix"
         value={product.prix}
+        placeholderTextColor="black"
         onChangeText={(text) => handleChange('prix', text)}
         keyboardType="numeric"
       />
@@ -104,6 +110,7 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
         style={styles.input}
         placeholder="Quantité"
         value={product.quantite}
+        placeholderTextColor="black"
         onChangeText={(text) => handleChange('quantite', text)}
         keyboardType="numeric"
       />
@@ -112,6 +119,7 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
         style={styles.input}
         placeholder="Description"
         value={product.description}
+        placeholderTextColor="black"
         onChangeText={(text) => handleChange('description', text)}
         multiline
       />
@@ -229,13 +237,19 @@ const ProductManagementScreen = () => {
   };
 
   const renderProductItem = ({ item }) => (
+    
     <View style={styles.productItem}>
-    
+   {item.images && typeof item.images === 'string' ? (
       <Image 
-        source={item.images}
-        style={styles.productImage} 
+        source={{ uri: item.images.startsWith('data:image') ? item.images : `data:image/jpeg;base64,${item.images}` }}
+        style={styles.productImage}
+        resizeMode="cover"
       />
-    
+    ) : (
+      <View style={[styles.productImage, styles.imagePlaceholder]}>
+        <Text>Image non disponible</Text>
+      </View>
+    )}
       <Text style={styles.productTitle}>{item.nom}</Text>
       <Text style={styles.categorie}>{item.categorie}</Text>
       <Text>{item.prix} €</Text>
@@ -263,12 +277,14 @@ const ProductManagementScreen = () => {
         onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
         initialValues={editingProduct || { nom: '', categorie: '', images: '', prix: '', quantite: '', description: '' }}
         isEditing={!!editingProduct}
+        style={styles.productForm}
       />
 
       <FlatList
         data={products}
         renderItem={renderProductItem}
         keyExtractor={(item) => item.id.toString()}
+
       />
     </View>
   );
@@ -293,6 +309,10 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderRadius: 10,
   },
+  productForm:{
+    gap:40,
+    paddingHorizontal:40
+  },
   input: {
     color: Colors.danger,
     height: 40,
@@ -304,12 +324,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: 300,
     borderRadius: 10,
+    fontWeight: 'bold',
+    fontSize:14
+  },
+  picker:{
+    color: Colors.danger,
+    fontWeight: 'bold'
   },
   productImage: {
-    width: '100%',
-    height: 200,
+    width: 100,
+    height: 100,
     resizeMode: 'cover',
-    borderRadius:15
+  },
+  imagePlaceholder: {
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   productTitle:{
     fontSize: 18,
@@ -327,6 +357,15 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingBottom:10,
     alignItems:'center'
+  },
+  imageButton:{
+    color:Colors.white,
+    backgroundColor: Colors.greenAgri,
+    padding: 10,
+    alignItems: 'center',
+    marginTop: 5,
+    marginHorizontal:40,
+    borderRadius:10
   },
   editButton: {
     color:Colors.white,
@@ -346,6 +385,19 @@ const styles = StyleSheet.create({
     marginHorizontal:40,
     borderRadius:10
   },
+  submitButton:{
+    backgroundColor:Colors.greenAgri,
+    padding: 10,
+    alignItems: 'center',
+    marginHorizontal: 5,
+    marginHorizontal:40,
+    borderRadius:10
+  },
+  submitButtonText:{
+    fontSize:18,
+    color:Colors.white
+
+  }
 });
 
 export default ProductManagementScreen;

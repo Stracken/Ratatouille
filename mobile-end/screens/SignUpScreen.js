@@ -41,11 +41,7 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
     ) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires");
       return false;
-    }
-    // if (userType === "producteur" && !companyName) {
-    //   Alert.alert("Erreur", "Veuillez entrer la raison sociale");
-    //   return false;
-    // }
+    } 
     if (role === "vendeur" && !raisonSociale) {
       Alert.alert("Erreur", "Raison sociale est requis pour les vendeurs");
       return false;
@@ -257,6 +253,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 10,
     borderRadius: 5,
+    color: Colors.white,
+  },
+  radioButtonText:{
     color: Colors.white,
   },
   radioButtonSelected: {

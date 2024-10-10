@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
 import Colors from "./constants/Colors";
-import MyTabs from "./components/MyTabs";
+import MyTabs from "./MyTabs";
 import CustomHeader from "./components/CustomHeader";
 import {
   BottomSheetModal,
@@ -11,24 +11,18 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React, { useRef, useMemo, useState } from "react";
 import Profil from "./screens/ProfilScreen";
 
-
-
 export default function MainApp() {
   const bottomSheetModalRef = useRef(null);
   const openModal = () => {
     bottomSheetModalRef.current?.present();
   };
   const snapPoints = useMemo(() => ["95%"], []);
-
   return (
-    
-<GestureHandlerRootView>
+    <GestureHandlerRootView>
       <BottomSheetModalProvider>
         <StatusBar style="auto" />
         <View style={styles.container}>
-          <CustomHeader openModal={openModal}></CustomHeader>
-          {/* <Header/> */}
-
+          <CustomHeader openModal={openModal} />
           <BottomSheetModal
             ref={bottomSheetModalRef}
             snapPoints={snapPoints}
@@ -39,14 +33,10 @@ export default function MainApp() {
               <Profil></Profil>
             </View>
           </BottomSheetModal>
-
           <MyTabs />
-          
         </View>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
-   
-    
   );
 }
 
