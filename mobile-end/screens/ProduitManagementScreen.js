@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image, Alert, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
@@ -7,7 +7,6 @@ import Colors from '../constants/Colors';
 import { API_URL } from '../config';
 import { useAuth } from "../context/AuthContext";
 import tinycolor from 'tinycolor2';
-import * as FileSystem from 'expo-file-system';
 
 const useProducts = (userId) => {
   const [products, setProducts] = useState([]);
@@ -43,7 +42,7 @@ const useProducts = (userId) => {
 
 const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
   const [product, setProduct] = useState(initialValues);
-
+  const [isDescriptionFocused, setIsDescriptionFocused] = useState(false);
   useEffect(() => {
     setProduct(initialValues);
   }, [initialValues]);
@@ -116,12 +115,18 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
       />
       
       <TextInput
-        style={styles.input}
+         style={[
+          styles.input, 
+          isDescriptionFocused && styles.expandedInput
+        ]}
         placeholder="Description"
         value={product.description}
         placeholderTextColor="black"
         onChangeText={(text) => handleChange('description', text)}
         multiline
+        numberOfLines={isDescriptionFocused ? 4 : 1}
+        onFocus={() => setIsDescriptionFocused(true)}
+        onBlur={() => setIsDescriptionFocused(false)}
       />
       
       <TouchableOpacity 
@@ -135,7 +140,28 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
     </View>
   );
 };
+//hook personnalisé pour détecter l'état du clavier  
+const useKeyboardStatus = () => {
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  return isKeyboardVisible;
+};
 const ProductManagementScreen = () => {
   const {user} = useAuth()
   const { products, loading, error, refetch } = useProducts(user?.id);
@@ -148,6 +174,8 @@ const ProductManagementScreen = () => {
     quantite: '',
     description: '',
   });
+  const isKeyboardVisible = useKeyboardStatus();
+
   
   
   const handleAddProduct = async (productData) => {
@@ -237,7 +265,8 @@ const ProductManagementScreen = () => {
   };
 
   const renderProductItem = ({ item }) => (
-    
+  
+
     <View style={styles.productItem}>
    {item.images && typeof item.images === 'string' ? (
       <Image 
@@ -270,38 +299,55 @@ const ProductManagementScreen = () => {
   if (error) return <Text>Erreur: {error}</Text>;
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={styles.container}
+  >
+    
       <Text style={styles.title}>Gestion des Produits</Text>
-      
+      <View style={styles.formContainer}>
       <ProductForm 
         onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
         initialValues={editingProduct || { nom: '', categorie: '', images: '', prix: '', quantite: '', description: '' }}
         isEditing={!!editingProduct}
         style={styles.productForm}
       />
-
+       
+      </View>
+      {!isKeyboardVisible && (
+      <View style={styles.listContainer}>
+      <Text style={styles.title}>Vos articles en ligne</Text>
+      
       <FlatList
         data={products}
         renderItem={renderProductItem}
         keyExtractor={(item) => item.id.toString()}
-
+        style={styles.productsManager}
       />
-    </View>
+      </View>
+       )}
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    paddingHorizontal: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    margin: 20,
-    marginTop:30,
+    margin: 10,
+    marginTop:15,
     textAlign: 'center',
     color:Colors.black
+  },
+  formContainer: {
+    height:'40%'},
+
+  listContainer: {
+    height:'52%'
   },
   image: {
     width: 100,
@@ -311,13 +357,13 @@ const styles = StyleSheet.create({
   },
   productForm:{
     gap:40,
-    paddingHorizontal:40
+    paddingHorizontal:40,
   },
   input: {
     color: Colors.danger,
-    height: 40,
+    height: 30,
     borderWidth: 1,
-    marginBottom: 10,
+    marginBottom: 5,
     paddingHorizontal: 10,
     backgroundColor: tinycolor(Colors.white).setAlpha(0.1).toString(),
     borderColor: Colors.white,
@@ -327,6 +373,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize:14
   },
+  expandedInput: {
+    height: 150,
+    textAlignVertical: 'top',
+  },
+  
   picker:{
     color: Colors.danger,
     fontWeight: 'bold'
@@ -361,12 +412,13 @@ const styles = StyleSheet.create({
   imageButton:{
     color:Colors.white,
     backgroundColor: Colors.greenAgri,
-    padding: 10,
+    padding: 5,
     alignItems: 'center',
     marginTop: 5,
     marginHorizontal:40,
     borderRadius:10
   },
+ 
   editButton: {
     color:Colors.white,
     backgroundColor: Colors.greenAgri,
@@ -387,7 +439,7 @@ const styles = StyleSheet.create({
   },
   submitButton:{
     backgroundColor:Colors.greenAgri,
-    padding: 10,
+    padding: 5,
     alignItems: 'center',
     marginHorizontal: 5,
     marginHorizontal:40,

@@ -18,6 +18,7 @@ import CookiesPage from "./screens/aboutScreens/CookiesPage";
 import ProductDetails from "./screens/ProductDetails";
 import { useAuth } from "./context/AuthContext";
 import ProductManagementScreen from "./screens/ProduitManagementScreen";
+import SearchResults from "./components/SearchResults";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -52,6 +53,7 @@ const ProductsStack = () => (
       options={{ headerShown: false }}
     />
     <Stack.Screen name="ProductDetails" component={ProductDetails} />
+    
   </Stack.Navigator>
 );
 
@@ -65,6 +67,14 @@ const BuyPageStack = () => (
   </Stack.Navigator>
 );
 
+const ResultsStack = () => (
+  <Stack.Navigator screenOptions={screenOptions}>
+<Stack.Screen 
+      name="SearchResults" 
+      component={SearchResults}
+      options={{ title: "Résultats de recherche" }}
+    />
+</Stack.Navigator>)
 const AboutStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
     <Stack.Screen
@@ -162,6 +172,16 @@ function MyTabs() {
             <Ionicons name="card" size={20} color={color} />
           ),
           tabBarBadge: cartItemsCount > 0 ? cartItemsCount.toString() : null,
+        }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={ResultsStack}
+        options={{
+          tabBarLabel: "Recherche",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="nutrition" size={20} color={color} />
+          ),
         }}
       />
       <Tab.Screen
