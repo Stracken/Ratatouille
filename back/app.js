@@ -1,13 +1,15 @@
+
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const app = express();
-const port = 3001; // Changé à 3001 pour éviter les conflits avec Next.js
+const port = 3001; 
 const multer = require('multer');
 const upload = multer();
-// const stripe = require('stripe')('sk_test_51PfNmyRpKgZkfjqiKOClHuOcFVUgJPdk5OqpYGCNHVPUBugcz2RpBOiTLYpNweAOtrJMS2Q6DXR5o3dl1d2tXQ6e00A9T86gec');
+const stripe = require('stripe')('sk_test_51PfNmyRpKgZkfjqiKOClHuOcFVUgJPdk5OqpYGCNHVPUBugcz2RpBOiTLYpNweAOtrJMS2Q6DXR5o3dl1d2tXQ6e00A9T86gec');
+
 
 // Configuration de la connexion à la base de données
 const pool = mysql.createConnection({
@@ -16,8 +18,16 @@ const pool = mysql.createConnection({
     password: '',
     database: 'ratatouille',
     connectTimeout: 60000, // Augmente le délai d'attente à 60 secondes
-    connectionLimit: 10
+    connectionLimit: 10,
+    queueLimit: 0
 });
+
+// const db = mysql.createPool({
+//   host: 'localhost',
+//   user: 'root',
+//   password: '',
+//   database: 'ratatouille',
+// });
 // Configuration CORS pour accepter toutes les origines
 const corsOptions =  {
     origin: '*',
@@ -41,6 +51,17 @@ console.log('Connecté à la base de données MySQL');
 app.use(cors(corsOptions)); // Permet les requêtes cross-origin
 app.use(express.json());
 
+// Vérification de la connexion au démarrage (facultatif)
+// (async () => {
+//   try {
+//       const connection = await pool.getConnection();
+//       console.log('Connecté à la base de données MySQL');
+//       connection.release(); // Libération de la connexion après vérification
+//   } catch (err) {
+//       console.error('Erreur de connexion à la base de données :', err);
+//       process.exit(1); // Arrête le serveur si la connexion échoue
+//   }
+// })();
 
 
 // Routes
@@ -251,6 +272,39 @@ app.get('/product', async (req, res) => {
     );
   } catch (error) {
     console.error("Erreur lors de la récupération des produits:", error);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+/////////////////////////////////////////// barre de recherche /////////////////////////////////////////////////////////////////////////////////////////////////////////
+app.get('/search-products', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.length < 3) {
+      return res.status(400).json({ error: "La requête de recherche doit contenir au moins 3 caractères" });
+    }
+
+    pool.query(
+      'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit WHERE nom LIKE ? ORDER BY date_creation DESC',
+      [`%${q}%`],
+      (err, results) => {
+        if (err) {
+          console.error("Erreur lors de la recherche des produits:", err);
+          return res.status(500).json({ error: "Erreur lors de la recherche des produits" });
+        }
+        // Convertir les images en Base64
+        const productsWithImages = results.map(product => ({
+          ...product,
+          images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
+        }));
+        // Renvoyer les produits trouvés
+        res.status(200).json({
+          message: 'Produits trouvés avec succès',
+          products: productsWithImages
+        });
+      }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la recherche des produits:", error);
     res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
@@ -504,6 +558,107 @@ app.delete('/products/:id', async (req, res) => {
 //      res.status(500).send({ error });
 //  }
 // });
+
+// Endpoint pour créer une intention de paiement
+// Endpoint pour créer une intention de paiement
+// app.post('/create-payment-intent', async (req, res) => {
+//   const { items } = req.body;
+
+//   try {
+//     // Calculer le montant total
+//     let total = 0;
+//     for (const item of items) {
+//       const [rows] = await pool.promise().query('SELECT prix, quantite FROM produit WHERE id = ?', [item.id]);
+//       if (rows.length > 0) {
+//         const { prix, quantite } = rows[0];
+//         if (item.quantity > quantite) {
+//           return res.status(400).json({ error: `Quantité insuffisante pour le produit ${item.id}` });
+//         }
+//         total += prix * item.quantity;
+//       }
+//     }
+
+//     // Créer l'intention de paiement
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: Math.round(total * 100), // Stripe utilise les centimes
+//       currency: 'eur',
+//     });
+
+//     // Envoyer la réponse avec le client secret
+//     return res.json({ clientSecret: paymentIntent.client_secret });
+    
+//   } catch (error) {
+//     console.error('Erreur lors de la création de l\'intention de paiement:', error);
+//     return res.status(500).json({ error: 'Erreur lors de la création de l\'intention de paiement' });
+//   }
+// });
+
+app.post('/create-payment-intent', async (req, res) => {
+  const { items } = req.body;
+
+  try {
+    let total = 0;
+    for (const item of items) {
+      const [rows] = await pool.promise().query('SELECT prix, quantite FROM produit WHERE id = ?', [item.id]);
+      if (rows.length > 0) {
+        const { prix, quantite } = rows[0];
+        if (item.quantity > quantite) {
+          return res.status(400).json({ error: `Quantité insuffisante pour le produit ${item.id}` });
+        }
+        total += prix * item.quantity;
+      }
+    }
+
+    if (total < 0.50) {
+      return res.status(400).json({ error: 'Le montant total doit être d\'au moins 0,50 €' });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(total * 100),
+      currency: 'eur',
+    });
+
+    return res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'intention de paiement:', error);
+    return res.status(500).json({ error: 'Erreur lors de la création de l\'intention de paiement' });
+  }
+});
+
+// Endpoint pour mettre à jour les quantités après un paiement réussi
+app.post('/update-quantities', async (req, res) => {
+  const { items } = req.body;
+
+  if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Items est requis et doit être un tableau.' });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+      await connection.beginTransaction(); // Démarre une transaction
+
+      await Promise.all(items.map(async (item) => {
+          const [result] = await connection.query(
+              'UPDATE produit SET quantite = quantite - ? WHERE id = ? AND quantite >= ?',
+              [item.quantity, item.id, item.quantity]
+          );
+
+          if (result.affectedRows === 0) {
+              throw new Error(`Quantité insuffisante pour le produit ${item.id}`);
+          }
+      }));
+
+      await connection.commit(); // Valide la transaction
+      res.json({ success: true });
+  } catch (error) {
+      console.error('Erreur lors de la mise à jour des quantités:', error);
+      await connection.rollback(); // Annule la transaction en cas d'erreur
+      res.status(500).json({ error: 'Erreur lors de la mise à jour des quantités' });
+  } finally {
+      connection.release(); // Libère la connexion après utilisation
+  }
+});
+
 
 // Démarrage du serveur
 app.listen(port, () => {
