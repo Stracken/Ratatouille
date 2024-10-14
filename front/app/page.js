@@ -2,15 +2,31 @@
 import Map from "@/componets/Map";
 import Head from "@/componets/Head/head";
 import Foot from "@/componets/Footer/foot";
-import React, { useState } from "react"
+import ProductList from "@/componets/ProduitList/ProduitList";
+import React, { useState, useEffect } from "react"
 import Image from "next/image";
 import  Link from 'next/link'
+import axios from 'axios';
+
 
 export default function Home() {
   var [search,  setSearch] = React.useState("");
   var [carousel, setCarousel] = React.useState(["/south.jpg","/7.jpg","/once.jpg"]);
   var [i, setI] = React.useState(0);
   var [name, setName] = React.useState(carousel[i]);
+  const [products, setProducts] = useState([]);
+
+
+  useEffect(() => {
+    axios.get('/produits/all')
+      .then(response => {
+        console.log(response.data); // Vérifiez si les données sont bien récupérées
+        setProducts(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
 
   const back = () => {
     if  (i === 0){
@@ -80,45 +96,12 @@ export default function Home() {
           </div>
           <div className="roundedgray"></div>
           <div className="article">
-            <h1>Pour vous</h1>
+          <h1>À la une</h1>
             <div className="prop">
-              <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              <Image src="/random.png" alt="Home Image" width={200}  height={45} />
+              <ProductList/>
             </div>
           </div>
-            <div className="roundedgray"></div>
-            <div className="article">
-              <h1>À proximité</h1>
-              <div className="prop">
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              </div>
-              <div className="roundedgray"></div>
-            </div>
-            <div className="article">
-              <h1>Vos catégories</h1>
-              <div className="prop">
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-                <Image src="/random.png" alt="Home Image" width={200}  height={45} />
-              </div>
-              <div className="roundedgray"></div>
-            </div>
-            <Foot/>
+          <Foot/>
         </div>
       </body>
     </>

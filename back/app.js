@@ -121,6 +121,42 @@ app.post('/produit', authenticateToken, (req, res) => {
     );
 });
 
+// Nouvelle route pour consulter tous les produits
+app.get('/produits/all', (req, res) => {
+    connection.query(
+        'SELECT * FROM produit',
+        (err, rows) => {
+            if (err) {
+                console.error('Error fetching products:', err);
+                res.status(500).json({ error: err.message });
+                return;
+            }
+        res.json(rows);
+        }
+    );
+});
+
+app.get('/produit/:id', (req, res) => {
+    const id = req.params.id;
+    connection.query(
+      'SELECT * FROM produit WHERE id = ?',
+      [id],
+      (err, rows) => {
+        if (err) {
+          console.error('Error fetching product:', err);
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        if (rows.length === 0) {
+          res.status(404).json({ error: 'Produit non trouvé' });
+          return;
+        }
+        const product = rows[0];
+        res.json(product);
+      }
+    );
+  });
+
 // Démarrage du serveur
 app.listen(port, () => {
     console.log(`Serveur en écoute sur le port ${port}`);
