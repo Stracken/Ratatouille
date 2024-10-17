@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
@@ -49,6 +50,7 @@ export default function ProductList() {
             <div key={product.id} className="product-card">
               {product.images && <img src={product.images} alt={product.nom} />}
               <h2>{product.nom}</h2>
+              <Link href={`/produit/${product.id}`}><button>Voir le produit</button></Link>
             </div>
           ))}
         </div>

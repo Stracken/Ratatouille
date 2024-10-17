@@ -1,24 +1,37 @@
-import { useParams } from 'next';
+"use client"
+import { useParams } from "next/navigation";
 import Head from "@/componets/Head/head";
 import Foot from "@/componets/Footer/foot";
 import Cardprod from "@/componets/Cardprod/Cardprod";
 import Image from "next/image";
 import AddToCard from "@/componets/AddToCard/AddToCard";
-import { getProducts } from '../api';
+import { getProducts } from "@/outils/api";
+import { useState, useEffect } from "react";
 
 const Produit = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const response = await getProducts();
-      const products = response.data;
-      const product = products.find((product) => product.id === parseInt(id));
-      setProduct(product);
-    };
-    fetchProduct();
-  }, [id]);
+      try {
+        const products = await getProducts();
+        const foundProduct = products.find((p) => p.id === parseInt(id));
+        if (foundProduct) {
+          setProduct(foundProduct);
+        } else {
+          setError('Produit non trouvé');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des produits:', error);
+        setError('Erreur lors de la récupération des produits');
+      }
+    };fetchProduct();}, [id]);
+
+  if (error) {
+    return <div>Erreur : {error}</div>;
+  }
 
   if (!product) {
     return <div>Chargement...</div>;
@@ -33,7 +46,7 @@ const Produit = () => {
             <h1>{product.nom}</h1>
             <div className="roundedblack"/>
             <div className="block">
-              <Image src={product.image} alt="product" width={200} height={50}/>
+            <img src={product.images} alt={product.nom} />
               <div className="roundedv"/>
               <div className="text">
                 <h1>Description</h1>

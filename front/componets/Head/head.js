@@ -6,8 +6,7 @@ function Head() {
         <div className="head">
             <div className="cate"><Image src="/search.png" alt="Home Image" width={30}  height={45} /></div>
             <div className="cate">
-                <Link href="/"><Image src="/imagesmode.png" alt="Home Image" width={30}  height={45} /></Link>
-                <h1>Bonjour</h1>
+                <Link href="/"><Image src="/logo.png" alt="Home Image" width={50}  height={45} /></Link>
             </div>
             <div className="cate">
                 <Link href="/historique"><Image src="/article.png" alt="Home Image" width={30}  height={45} /></Link>
