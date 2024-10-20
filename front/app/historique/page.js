@@ -1,6 +1,6 @@
 "use client";
 import Head from "@/componets/Head/head";
-import Foot from "@/componets/Footer/footer";
+import Foot from "@/componets/Footer/foot";
 import Image from "next/image";
 import Link from "next/link";
 

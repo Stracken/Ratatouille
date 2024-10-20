@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Head from "@/componets/Head/head";
-import Foot from "@/componets/Footer/footer";
+import Foot from "@/componets/Footer/foot";
 import Cardprod from "@/componets/Cardprod/Cardprod";
 import Image from "next/image";
 

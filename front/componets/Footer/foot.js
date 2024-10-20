@@ -5,7 +5,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
-function Footer() {
+function Foot() {
   return (
     <>
       <div className="footer">
@@ -108,4 +108,4 @@ function Footer() {
   );
 }
 
-export default Footer;
+export default Foot;
