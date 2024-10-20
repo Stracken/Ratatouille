@@ -72,7 +72,7 @@ const ResultsStack = () => (
 <Stack.Screen 
       name="SearchResults" 
       component={SearchResults}
-      options={{ title: "Résultats de recherche" }}
+      options={{ title: "R\u00E9sultats de recherche" }}
     />
 </Stack.Navigator>)
 const AboutStack = () => (

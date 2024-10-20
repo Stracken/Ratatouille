@@ -12,7 +12,7 @@ const ProductDetails = ({ route }) => {
             <Text style={styles.title}>{product.title}</Text>
             <Text style={styles.price}>Prix: {product.price}€</Text>
             <Text style={styles.quantity}>Quantité disponible: {product.quantity}</Text>
-            <Text style={styles.category}>Catégorie: {product.title}</Text>
+            <Text style={styles.category}>Catégorie: {product.categorie}</Text>
             <View style={styles.quantityContainer}>
         
       </View>
@@ -20,22 +20,35 @@ const ProductDetails = ({ route }) => {
             
         <View style={styles.producerInfo}>
             <Text style={styles.producerTitle}>Information sur le producteur</Text>
-            {product.userProducteurId && product.userProducteurId.length > 0 && (
+            {/* {product.userId && product.userId.length > 0 && (
     <View>
-      {/* {product.user_lastName && product.user_firstName && (
+      {product.user_lastName && product.user_firstName && (
             <View>
               <Text>Nom du producteur: {product.user_lastName} {product.user_firstName}</Text>
-              {/* Ajoutez d'autres informations sur le producteur si disponibles */}
+               Ajoutez d'autres informations sur le producteur si disponibles 
               
-            {/* </View>
-          )} */} 
-   <Text>Nom du producteur: {product.user_id[0].firstName}</Text>
-      <Text>Information: {product.userProducteurId[0].producerInfo}</Text>
+             </View>
+          )} 
+   <Text>Nom du producteur: {product.firstName}</Text>
+      <Text>Information: {product.userId[0].producerInfo}</Text>
       <Text>Titre: {product.userProducteurId[0].producerTitle}</Text>
     </View>
    
     
-  )}
+  )} */}
+   {product.userId && (
+            <View>
+              <Text>Nom du producteur: {product.userId.nom} {product.userId.prenom}</Text>
+              <Text>Email: {product.userId.email}</Text>
+              <Text>Téléphone: {product.userId.telephone || 'Non renseigné'}</Text>
+              <Text>Adresse: {product.userId.adresse || 'Non renseignée'}</Text>
+              <Text>Ville: {product.userId.ville || 'Non renseignée'}</Text>
+              <Text>Code postal: {product.userId.code_postal || 'Non renseigné'}</Text>
+              {product.userId.raison_sociale && (
+                <Text>Raison sociale: {product.userId.raison_sociale}</Text>
+              )}
+            </View>
+          )}
         </View>
         </View>
       

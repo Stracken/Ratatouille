@@ -51,8 +51,9 @@ const HomeProducts = ({}) => {
                 title: item.nom,
                 price: item.prix,
                 quantity: item.quantite,
-                images: item.images,
-                description: item.description
+                description: item.description,
+                images: item.images, 
+                userId: item.user_id
               }}
               handleQuantityChange={handleQuantityChange}
               handleAddToCart={handleAddToCart}

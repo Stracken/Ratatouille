@@ -1,6 +1,7 @@
-export const API_URL = 'http://192.168.1.122:3001'; // Pour l'émulateur Android
+export const API_URL = 'http://192.168.1.37:3001'; // Pour l'émulateur Android
 // ou
 // export const API_URL = 'http://localhost:3001'; // Pour iOS
+// 192.168.1.37
 // 192.168.1.3
 // http://192.168.1.3:3001
 // 'http://192.168.1.124:3001'
@@ -8,7 +9,7 @@ export const API_URL = 'http://192.168.1.122:3001'; // Pour l'émulateur Android
 // 192.168.1.122
 // http://192.168.1.133
 // http://192.168.1.86:3001
-
+// 192.168.1.23
 export const SECRET_KEY ='sk_test_51PfNmyRpKgZkfjqiKOClHuOcFVUgJPdk5OqpYGCNHVPUBugcz2RpBOiTLYpNweAOtrJMS2Q6DXR5o3dl1d2tXQ6e00A9T86gec'
 
 export const PUBLIC_KEY ='pk_test_51PfNmyRpKgZkfjqiZU6RXcDkGN4tjVTxY5TA9twzE48MEUMQe8fQojaXd7wJWUaSbRg2jgHmprVUWBGvQ8v8b41K00NeOYreRk'

@@ -140,7 +140,9 @@ const fetchProduct = async () => {
               title: item.nom,
               price: item.prix,
               quantity: item.quantite,
-              images: item.images, // Assurez-vous que l'URL de l'image est correcte
+              description: item.description,
+              images: item.images, 
+              userId: item.user_id
             }}
             addToCart={handleAddToCart}
             updateCartItemQuantity={updateCartItemQuantity}
