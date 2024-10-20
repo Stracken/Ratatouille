@@ -19,35 +19,34 @@ body {
 }
 
 .Map{
-    position: fixed;
     width:100%;
     height: 100vh;
     z-index: 1;
 }
-.search{
+.search {
     position: absolute;
     z-index: 2;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    width: 20vw;
+    width: 20%; /* modifié de 20vw à 20% */
     height: 5vw;
-    background-color:#038D00;
+    background-color: #038D00;
     margin-top: 5.5vw;
     margin-left: 0.5vw;
     border-radius: 10px;
-}
+  }
 
 .sug{
     color: white;
     position: absolute;
-    margin-left: 78.5vw;
+    margin-left: 78.5%; /* modifié de 78.5vw à 78.5% */
     margin-top: 5.5vw;
     z-index: 2;
     display: flex;
     flex-direction: column;
     height: auto;
-    width: 20vw;
+    width: 20%; /* modifié de 20vw à 20% */
     background-color: #038D00;
     border-radius: 2%;
     .section{
@@ -216,12 +215,12 @@ li{
     width: 100%;
 }
 
-.Mapcard{
-    width: 30vw;
+.Mapcard {
+    width: 30%; /* modifié de 30vw à 30% */
     height: 20vw;
     border-radius: 2vw;
-    margin-bottom: 1%;
-}
+    margin-bottom : 1%;
+  }
 
 .baniere{
     z-index: 1;
@@ -284,8 +283,8 @@ li{
     }
 }
 
-.produit{
-    width: 95%;
+.produit {
+    width: 90%; /* modifié de 95% à 90% */
     height: auto;
     min-height: 30%;
     display: flex;
@@ -293,7 +292,7 @@ li{
     border-radius: 2vw;
     margin-left: 2.5%;
     margin-top: 3%;
-}
+  }
 
 .description{
     display: flex;
@@ -420,7 +419,7 @@ li{
     align-items: center;
     
     h1{
-        font-size: 2.5vw;
+        font-size: 1.5vw;
         font-weight: bold;
     }
     h2{
@@ -585,99 +584,145 @@ li{
         height: 7vw;
     }
 }
-.containerHomeProducts{
-    padding: 20px; 
-  }
-  
-  .productListHomeProducts{
-    display: grid;
-    grid-template-columns: repeat(2,1fr); 
-    gap: 20px; 
-  }
-  
-  .productWrapperHomeProducts{
+button{
+    cursor: pointer;
+}
+.button {
+    max-width: 200px;
+    height: 40px;
+    background-color: #4CAF50!important;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.formulaire{
+    display: flex;
+    flex-direction: column;
+    margin-top: 5%;
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    justify-content: center;
+    align-items: center;
+    h2{
+        font-size: 1.5vw;
+        margin-top: 10px;
+    }
+}
+
+/* Style global du formulaire */
+form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
     border: 1px solid #ccc;
-    border-radius: 8px;
-    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+  /* Style des labels et des inputs */
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+label > span {
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+input[type="tel"] {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 20px;
     padding: 10px;
+    border: 1px solid #ccc;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style du bouton de soumission */
+button[type="submit"] {
+    width: 100%;
+    height: 40px;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+
+/* Style des erreurs */
+.error {
+    color: red;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.product-grid {
+    max-width: 100%; /* ajoutez cette propriété */
+    width: 100%;
+    overflow-x: hidden;
+    position: relative;
+    flex-wrap: wrap; /* ajoutez cette propriété */
+}
+
+.product-grid-inner {
+    display: flex;
+    flex-wrap: wrap; /* ajoutez cette propriété */
+    width: 100%;
+    padding: 20px;
+}
+
+.product-card {
+    margin: 20px;
+    display: inline-block;
+    width: 200px; /* ajuster la largeur selon vos besoins */
+}
+
+.product-card img {
+    width: 100%;
+    height: 150px; /* ajuster la hauteur selon vos besoins */
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.product-card h2 {
+    font-size: 18px;
+    margin-top: 10px;
     text-align: center;
-  }
-  .articleContainer {
-    display: 'flex';
-    flex-direction: 'row';
-    margin-bottom: '20px';
-    background-color: 'white';
-    border-radius: '10px';
-    padding: '10px';
-    margin: '0 20px';
-  }
-  .articleimage{
-    width: '100px';
-    height: '100px';
-    object-fit: 'cover';
-    border-radius: '10px';
-  }
-  .articleInfo {
-    flex: 1;
-    margin-left: '10px';
-  }
-  .articleName {
-    font-size: '18px';
-    font-weight: 'bold';
-    margin-bottom: '5px';
-    color: '#FF6347'; 
-  }
-  .articlePrice{
-    font-size: '16px';
-    color: '#888888';
-    margin-bottom: '5px';
-  }
-  .articleQuantityButton {
-    display: 'flex';
-    align-items: 'center';
-  }
-  .articleQuantityButton {
-    background-color: '#ddd';
-    padding: '5px';
-    border-radius: '5px';
-  }
-  .articleQuantity {
-    margin-left: '15px';
-    margin-right: '15px';
-    font-size: '18px';
-  }
-  .buyPagecontainer {
-    display: 'flex';
-    flex-direction: 'column';
-    align-items: 'center';
-    background-color: '#f5f5f5';
-    flex-grow: 1;
-  }
-  .buyPagetitle {
-    font-size: '24px';
-    font-weight: 'bold';
-    margin-top: '30px';
-    text-align: 'center';
-    color:'#000000'
-  }
-  .buyPageTotalPrice {
-    font-size: '20px';
-    font-weight: 'bold';
-    margin-top:'20px'
-    
 }
-.buyPagePayButton{
-   background-color:'darkgreen'; 
-   padding:'15px'; 
-   border-radius:'5px'; 
-   color:'white'; 
-   font-weight:'bold'; 
-   cursor:'pointer'
+
+/* Boutons de navigation */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
 }
-.buyPageNoFood{
-   color:'#000000'; 
-   font-size:'20px'; 
-   align-self:'center'; 
-   margin-top:"50%";
-   margin-bottom:"50%"
+
+.nav-btn.prev {
+    left: 10px;
+}
+
+.nav-btn.next {
+    right: 10px;
 }

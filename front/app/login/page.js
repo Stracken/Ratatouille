@@ -31,23 +31,28 @@
 // }
 
 "use client"
-import SignupForm from '@/componets/SignupForm/SignupForm';
-import LoginForm from '@/componets/LoginForm/LoginForm'; // Assurez-vous que le chemin est correct
+import LoginForm from '@/componets/LoginForm/LoginForm';
 import AddProductForm from '@/componets/Addproduct/AddproductForm';
-import AuthStatus from '@/componets/AuthStatus/AuthStatus';
+import Link from 'next/link'
+import Head from '@/componets/Head/head';
+import Foot from '@/componets/Footer/foot';
 
-export default function Home() {
+export default function Login() {
   console.log('Home component rendering');
   return (
-    <div>
-      <h1>Ma boutique en ligne</h1>
-      <AuthStatus />
-      <h2>Inscription</h2>
-      <SignupForm />
-      <h2>Connexion</h2>    
-      <LoginForm />
-      <h2>Ajouter un produit</h2>
-      <AddProductForm />
-    </div>
+    <>
+    <Head/>
+      <div className='formulaire'>
+        <h2>Connexion</h2>
+        <LoginForm />
+        <button type="button" className='button'> 
+          <Link href="/signup">Créer un compte</Link>
+        </button>
+        <h2>Ajouter un produit</h2>
+        <AddProductForm />
+        <Foot/>
+      </div>
+      
+    </>
   );
 }

@@ -1,65 +1,49 @@
-//outils/api.js
-
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000', 
+  baseURL: 'http://localhost:3001',
 });
 
-export const signup = (userData) => api.post('/signup', userData);
-export const login = (credentials) => api.post('/login', credentials);
-export const addProduct = (productData, token) => api.post('/product', productData, {
-  headers: { Authorization: `Bearer ${token}` }
-});
-// Fonction pour obtenir des produits par catégorie
-export async function getProductsByCategory (productData) {
-  try {
-    const response = await fetch(`http://localhost:3000/${productData}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch product');
-    }
-    return response.json();
-  } catch (error) {
-    console.error("Error in getProductsByCategory:", error);
-    throw error;
-  }
+let token = localStorage.getItem('token');
+
+if (token) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
-export async function getProductsSelected(id) {
-  try {
-    const response = await fetch(`http://localhost:3000/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch product');
-    }
-    return response.json();
-  } catch (error) {
-    console.error("Error in getProductsSelected:", error);
-    throw error;
-  }
-}
-export async function getProductById(id) {
-  // Ici, vous feriez normalement un appel à votre API ou base de données
-  // Pour cet exemple, nous allons simuler un appel API
-  const response = await fetch(`http://localhost:3000/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch product');
-  }
-  return response.json();
-}
-// export async function getProductsByCategory(categoryId) {
-//   // Simuler un appel API
-//   await new Promise(resolve => setTimeout(resolve, 1000));
-  
-//   // Données factices
-//   const fakeProducts = [
-//     { id: 1, name: 'Produit 1', price: 19.99, category: categoryId },
-//     { id: 2, name: 'Produit 2', price: 29.99, category: categoryId },
-//     { id: 3, name: 'Produit 3', price: 39.99, category: categoryId },
-// //   ];
+export const login = (credentials) => {
+  return api.post('/login', credentials)
+    .then(response => {
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      return response;
+    })
+    .catch(error => {
+      localStorage.removeItem('token');
+      throw error;
+    });
+};
 
-//   return { data: fakeProducts };
-// }
+export const signup = (userData) => {
+  return api.post('/signup', userData);
+};
 
+export const addProduct = (productData) => {
+  return api.post('/produit', productData);
+};
 
+export const logout = () => {
+  localStorage.removeItem('token');
+  delete api.defaults.headers.common['Authorization'];
+};
 
-export default api;
+export const getProducts = () => {
+  return api.get('/produits/all')
+    .then(response => {
+      return response.data;
+    })
+    .catch(error => {
+      console.error(error);
+      throw error;
+    });
+};

@@ -1397,7 +1397,7 @@ app.post('/signup', async (req, res) => {
               console.log('Aucun utilisateur trouvé pour cet email');
               return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
             }
-      
+
             const user = rows[0];
 
             console.log('Utilisateur trouvé:', { id: user.id, email: user.email });

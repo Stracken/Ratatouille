@@ -1,21 +1,32 @@
 "use client";
 import Map from "@/componets/Map";
 import Head from "@/componets/Head/head";
-import Footer from "@/componets/Footer/footer";
-import React, { useState } from "react";
+import Foot from "@/componets/Footer/foot";
+import ProductList from "@/componets/ProduitList/ProduitList";
+import React, { useState, useEffect } from "react"
 import Image from "next/image";
-import Link from "next/link";
-import Carousel from "@/componets/Carousel/Carousel";
-import { useRouter } from "next/navigation";
-import HomeProducts from "../componets/HomeProducts";
-import { CartProvider } from "../context/CartContext";
+import  Link from 'next/link'
+import axios from 'axios';
+
 
 export default function Home() {
-  const [search, setSearch] = useState("");
-  const [carousel, setCarousel] = useState([]);
-  const [i, setI] = useState(0);
-  const [name, setName] = useState(carousel[i]);
-  const router = useRouter();
+  var [search,  setSearch] = React.useState("");
+  var [carousel, setCarousel] = React.useState(["/south.jpg","/7.jpg","/once.jpg"]);
+  var [i, setI] = React.useState(0);
+  var [name, setName] = React.useState(carousel[i]);
+  const [products, setProducts] = useState([]);
+
+
+  useEffect(() => {
+    axios.get('/produits/all')
+      .then(response => {
+        console.log(response.data); // Vérifiez si les données sont bien récupérées
+        setProducts(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
 
   // const back = () => {
   //   const newIndex = i === 0 ? carousel.length - 1 : i - 1;
@@ -90,27 +101,12 @@ export default function Home() {
           </div>
           <div className="roundedgray"></div>
           <div className="article">
-            <h1>Nos produits récents</h1>
-            <HomeProducts />
-          </div>
-          <div className="roundedgray"></div>
-          <div className="article">
-            <h1>À proximité</h1>
+          <h1>À la une</h1>
             <div className="prop">
-              {Array.from({ length: 7 }).map((_, index) => (
-                <Image
-                  key={index}
-                  src="/random.png"
-                  alt="Home Image"
-                  width={200}
-                  height={45}
-                />
-              ))}
+              <ProductList/>
             </div>
-            <div className="roundedgray"></div>
           </div>
-          {/* Répétez pour les catégories */}
-          <Footer />
+          <Foot/>
         </div>
       </main>
     </CartProvider>
