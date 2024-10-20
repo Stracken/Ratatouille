@@ -10,7 +10,10 @@ export default function SignupForm() {
     adresse: '',
     ville: '',
     code_postal: '',
-    telephone: ''
+    telephone: '',
+    role: 'client', // Définir le rôle par défaut comme 'client'
+    photo_profil: '',
+    photo_banniere: ''
   });
 
   const handleChange = (e) => {
@@ -18,6 +21,13 @@ export default function SignupForm() {
     setFormData(prevState => ({
       ...prevState,
       [name]: value
+    }));
+  };
+
+  const handleRoleChange = (e) => {
+    setFormData(prevState => ({
+      ...prevState,
+      role: e.target.value // Mettre à jour le rôle dans formData
     }));
   };
 
@@ -35,7 +45,10 @@ export default function SignupForm() {
         adresse: '',
         ville: '',
         code_postal: '',
-        telephone: ''
+        telephone: '',
+        role: 'client', // Réinitialiser le rôle à 'client'
+        photo_profil: '',
+        photo_banniere: ''
       });
     } catch (error) {
       alert('Erreur lors de l\'inscription : ' + error.message);
@@ -44,6 +57,27 @@ export default function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit}>
+      <div>
+        <label>Type d'utilisateur:</label>
+        <label>
+          <input
+            type="radio"
+            value="client"
+            checked={formData.role === 'client'}
+            onChange={handleRoleChange}
+          />
+          Client
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="vendeur"
+            checked={formData.role === 'vendeur'}
+            onChange={handleRoleChange}
+          />
+          Vendeur
+        </label>
+      </div>
       <div>
         <label htmlFor="email">Email:</label>
         <input
@@ -128,6 +162,28 @@ export default function SignupForm() {
           onChange={handleChange}
         />
       </div>
+      <div>
+        <label htmlFor="photo_profil">Lien de la photo de profil:</label>
+        <input
+          type="text"
+          id="photo_profil"
+          name ="photo_profil"
+          value={formData.photo_profil}
+          onChange={handleChange}
+        />
+      </div>
+      {formData.role === 'vendeur' && (
+        <div>
+          <label htmlFor="photo_banniere">Lien de la photo de bannière:</label>
+          <input
+            type="text"
+            id="photo_banniere"
+            name="photo_banniere"
+            value={formData.photo_banniere}
+            onChange={handleChange}
+          />
+        </div>
+      )}
       <button type="submit">S'inscrire</button>
     </form>
   );

@@ -3,6 +3,7 @@ import Map from "@/componets/Map";
 import Head from "@/componets/Head/head";
 import Foot from "@/componets/Footer/foot";
 import ProductList from "@/componets/ProduitList/ProduitList";
+import ProduitByCat from "@/componets/ProduitByCat/ProduitByCat";
 import React, { useState, useEffect } from "react"
 import Image from "next/image";
 import  Link from 'next/link'
@@ -96,9 +97,17 @@ export default function Home() {
           </div>
           <div className="roundedgray"></div>
           <div className="article">
-          <h1>À la une</h1>
             <div className="prop">
+              <h1>À la une</h1>
               <ProductList/>
+            </div>
+            <div className="prop">
+              <h1>Viandes</h1>
+              <ProduitByCat>Viande</ProduitByCat>
+            </div>
+            <div className="prop">
+              <h1>Produits laitiers</h1>
+              <ProduitByCat>Produits laitiers</ProduitByCat>
             </div>
           </div>
           <Foot/>

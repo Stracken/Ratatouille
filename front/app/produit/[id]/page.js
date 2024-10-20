@@ -64,7 +64,7 @@ const Produit = () => {
               <div className="roundedgray"/>
               <div className="tab">
                 <h2>Viande</h2>
-                <h2>{product.viande}</h2>
+                <h2>{product.categorie}</h2>
               </div>
               <div className="roundedgray"/>
               <div className="tab">

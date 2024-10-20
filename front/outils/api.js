@@ -47,3 +47,47 @@ export const getProducts = () => {
       throw error;
     });
 };
+
+export const getProductsByCategory = (category) => {
+  return api.get('/produits', { params: { categorie: category } })
+    .then(response => {
+      return response.data;
+    })
+    .catch(error => {
+      console.error(error);
+      throw error;
+    });
+};
+
+export const getCategories = () => {
+  return api.get('/categories')
+    .then(response => {
+      return response.data;
+    })
+    .catch(error => {
+      console.error(error);
+      throw error;
+    });
+}
+
+export const getUserById = (id) => {
+  return api.get(`/user/${id}`)
+    .then(response => {
+      return response.data;
+    })
+    .catch(error => {
+      console.error(error);
+      throw error;
+    });
+};
+
+export const getProduitsByUserId = (userId) => {
+  return api.get(`/produits/user/${userId}`)
+    .then(response => {
+      return response.data;
+    })
+    .catch(error => {
+      console.error(error);
+      throw error;
+    });
+};

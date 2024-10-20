@@ -43,15 +43,19 @@ const authenticateToken = (req, res, next) => {
 
 app.post('/signup', async (req, res) => {
     try {
-        const { email, password, nom, prenom, adresse, ville, code_postal, telephone } = req.body;
-        console.log('Received signup request:', email, nom, prenom);
+        const { email, password, nom, prenom, adresse, ville, code_postal, telephone, photo_profil, photo_banniere } = req.body;
+
+        // Ajoutez la variable role par défaut si elle n'est pas présente dans req.body
+        const role = req.body.role || 'client'; // Vous pouvez changer 'utilisateur' par la valeur par défaut que vous souhaitez
+
+        console.log('Received signup request:', email, role, nom, prenom);
 
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log('Hashed password:', hashedPassword);
 
         connection.query(
-            'INSERT INTO user (email, mot_de_passe, role, nom, prenom, adresse, ville, code_postal, telephone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [email, hashedPassword, 'client', nom, prenom, adresse, ville, code_postal, telephone],
+            'INSERT INTO user (email, mot_de_passe, role, nom, prenom, adresse, ville, code_postal, telephone, photo_profil, photo_banniere) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [email, hashedPassword, role, nom, prenom, adresse, ville, code_postal, telephone, photo_profil, photo_banniere],
             (err, result) => {
                 if (err) {
                     console.error('Error during signup:', err);
@@ -104,12 +108,12 @@ app.post('/login', (req, res) => {
 
 // Nouvelle route pour ajouter un produit
 app.post('/produit', authenticateToken, (req, res) => {
-    const { nom, categorie, images, prix, quantite, description } = req.body;
+    const { nom, categorie, images, prix, quantite, description, sous_categorie } = req.body;
     const userId = req.user.userId;
 
     connection.query(
-        'INSERT INTO produit (nom, categorie, images, prix, quantite, description, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [nom, categorie, images, prix, quantite, description, userId],
+        'INSERT INTO produit (nom, categorie, images, prix, quantite, description, user_id, sous_categorie) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [nom, categorie, images, prix, quantite, description, userId, sous_categorie],
         (err, result) => {
             if (err) {
                 console.error('Error adding product:', err);
@@ -136,6 +140,25 @@ app.get('/produits/all', (req, res) => {
     );
 });
 
+
+// Nouvelle route pour consulter les produits par userId
+app.get('/produits/user/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    connection.query(
+        'SELECT * FROM produit WHERE user_id = ?',
+        [userId],
+        (err, rows) => {
+            if (err) {
+                console.error('Error fetching products by userId:', err);
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json(rows);
+        }
+    );
+});
+
 app.get('/produit/:id', (req, res) => {
     const id = req.params.id;
     connection.query(
@@ -156,6 +179,64 @@ app.get('/produit/:id', (req, res) => {
       }
     );
   });
+
+// Nouvelle route pour consulter un utilisateur par son ID
+app.get('/user/:id', (req, res) => {
+    const id = req.params.id;
+
+    connection.query(
+        'SELECT id, email, nom, prenom, adresse, ville, code_postal, telephone, photo_profil, photo_banniere, role FROM user WHERE id = ?',
+        [id],
+        (err, rows) => {
+            if (err) {
+                console.error('Error fetching user:', err);
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'Utilisateur non trouvé' });
+            }
+            const user = rows[0];
+            res.json(user);
+        }
+    );
+});
+
+// Route pour récupérer toutes les catégories
+app.get('/categories', (req, res) => {
+    connection.query(
+        'SELECT * FROM categories', // Assurez-vous que cette table existe dans votre base de données
+        (err, rows) => {
+            if (err) {
+                console.error('Error fetching categories:', err);
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json(rows);
+        }
+    );
+});
+
+// Nouvelle route pour consulter les produits par catégorie
+app.get('/produits', (req, res) => {
+    const { categorie } = req.query;
+    let query = 'SELECT * FROM produit';
+    const params = [];
+
+    if (categorie) {
+        query += ' WHERE categorie = ?';
+        params.push(categorie);
+    }
+
+    connection.query(query, params, (err, rows) => {
+        if (err) {
+            console.error('Error fetching products:', err);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
 
 // Démarrage du serveur
 app.listen(port, () => {
