@@ -11,7 +11,8 @@ import CookiesPage from "../screens/aboutScreens/CookiesPage";
 
 const Stack2 = createStackNavigator();
 const { height } = Dimensions.get("window");
-// Définissez le composant AboutScreen séparément
+
+
 const AboutScreen = ({ navigation }) => (
   <ScrollView contentContainerStyle={styles.scrollViewContent}>
     <View style={styles.aboutPage}>

@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
 const ProductDetails = ({ route }) => {
-  const { product} = route.params;
+  const {product, cart} = route.params;
 
   return (
     <ScrollView style={styles.container}>
@@ -12,7 +12,7 @@ const ProductDetails = ({ route }) => {
             <Text style={styles.title}>{product.title}</Text>
             <Text style={styles.price}>Prix: {product.price}€</Text>
             <Text style={styles.quantity}>Quantité disponible: {product.quantity}</Text>
-            <Text style={styles.category}>Catégorie: {product.categorie}</Text>
+            <Text style={styles.category}>Catégorie: {product.categorie_id}</Text>
             <View style={styles.quantityContainer}>
         
       </View>
@@ -20,25 +20,10 @@ const ProductDetails = ({ route }) => {
             
         <View style={styles.producerInfo}>
             <Text style={styles.producerTitle}>Information sur le producteur</Text>
-            {/* {product.userId && product.userId.length > 0 && (
-    <View>
-      {product.user_lastName && product.user_firstName && (
-            <View>
-              <Text>Nom du producteur: {product.user_lastName} {product.user_firstName}</Text>
-               Ajoutez d'autres informations sur le producteur si disponibles 
-              
-             </View>
-          )} 
-   <Text>Nom du producteur: {product.firstName}</Text>
-      <Text>Information: {product.userId[0].producerInfo}</Text>
-      <Text>Titre: {product.userProducteurId[0].producerTitle}</Text>
-    </View>
-   
-    
-  )} */}
+            
    {product.userId && (
             <View>
-              <Text>Nom du producteur: {product.userId.nom} {product.userId.prenom}</Text>
+              <Text>Nom du producteur: {product.userId} {product.userId.prenom}</Text>
               <Text>Email: {product.userId.email}</Text>
               <Text>Téléphone: {product.userId.telephone || 'Non renseigné'}</Text>
               <Text>Adresse: {product.userId.adresse || 'Non renseignée'}</Text>

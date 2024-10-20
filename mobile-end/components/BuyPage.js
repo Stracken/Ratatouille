@@ -158,38 +158,7 @@ useEffect(() => {
       }
     }
   };
-  //   if (error) {
-  //     console.error('Erreur lors de la présentation:', error);
-  //     alert('Erreur lors du traitement du paiement. Veuillez réessayer.');
-  //   } else {
-  //     alert('Paiement réussi !');
-      
-  //     // Mettre à jour les quantités
-  //     try {
-  //       const response = await fetch(`${API_URL}/update-quantities`, {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({
-  //           items: cart.map(item => ({ id: item.id, quantity: item.selectedQuantity }))
-  //         }),
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorResponse = await response.json();
-  //         throw new Error(errorResponse.error || 'Erreur lors de la mise à jour des quantités');
-  //       }
-
-  //       // Vider le panier ou naviguer vers une page de confirmation
-  //       alert('Quantités mises à jour avec succès !');
-        
-  //     } catch (error) {
-  //       console.error('Erreur lors de la mise à jour des quantités:', error);
-  //       alert(error.message); // Affichez l'erreur à l'utilisateur
-  //     }
-  //   }
-  // };
+  
   const renderFooter = () => (
     <View>
       <Text style={styles.totalPrice}>Prix Total: {totalPrice}€</Text>

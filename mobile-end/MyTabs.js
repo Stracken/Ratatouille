@@ -19,10 +19,21 @@ import ProductDetails from "./screens/ProductDetails";
 import { useAuth } from "./context/AuthContext";
 import ProductManagementScreen from "./screens/ProduitManagementScreen";
 import SearchResults from "./components/SearchResults";
+import { HeaderBackButton } from '@react-navigation/elements';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+const commonProductDetailsOptions = ({ navigation }) => ({
+  headerShown: true,
+  headerLeft: (props) => (
+    <HeaderBackButton
+      {...props}
+      onPress={() => navigation.goBack()}
+    />
+  ),
+  title: "Détails du produit",
+});
 // Création de composant de pile pour chaque onglet nécéssitant une navigation interne
 const HomeStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
@@ -31,7 +42,7 @@ const HomeStack = () => (
       component={Home}
       options={{ headerShown: false }}
     />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} />
+    <Stack.Screen name="ProductDetails" component={ProductDetails} options={commonProductDetailsOptions}/>
   </Stack.Navigator>
 );
 
@@ -52,7 +63,7 @@ const ProductsStack = () => (
       component={Products}
       options={{ headerShown: false }}
     />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} />
+    <Stack.Screen name="ProductDetails" component={ProductDetails} options={commonProductDetailsOptions} />
     
   </Stack.Navigator>
 );

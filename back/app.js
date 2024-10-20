@@ -1242,7 +1242,6 @@ const pool = mysql.createConnection({
     database: 'ratatouille',
     connectTimeout: 60000, // Augmente le délai d'attente à 60 secondes
     connectionLimit: 10,
-    queueLimit: 0
 });
 
 // const db = mysql.createPool({
@@ -1443,7 +1442,7 @@ app.post('/signup', async (req, res) => {
         );
       });
 
-   // Dans votre fichier principal d'application (par exemple, app.js ou server.js)
+   // Dans votre fichier principal d'application
    app.get('/:categorie', async (req, res) => {
     try {
       // Récupération de tous les produits depuis la base de données
@@ -1726,7 +1725,7 @@ app.get('/products/:userId', async (req, res) => {
 //     res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
 //   });
 // });
-app.post('/products', upload.single('images'), async (req, res) => {
+app.post('/products/', upload.single('images'), async (req, res) => {
   const {nom, categorie, prix, quantite, description } = req.body;
   const user_id = req.body.user_id;
 
