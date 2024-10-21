@@ -1,34 +1,36 @@
-import React from 'react';
-import { TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
-import RazorpayCheckout from 'react-native-razorpay';
-import Colors from '../constants/Colors';
+import React from "react";
+import { TouchableOpacity, Text, Image, StyleSheet } from "react-native";
+import RazorpayCheckout from "react-native-razorpay";
+import Colors from "../constants/Colors";
 
-const logoImage = require('../assets/images/logo.jpg');
+const logoImage = require("../assets/images/logo.jpg");
 
 const PaymentButton = ({ amount, onSuccess }) => {
   const handlePayment = () => {
     var options = {
-      description: 'Achat TerroTerro',
+      description: "Achat TerroTerro",
       image: Image.resolveAssetSource(logoImage).uri,
-      currency: 'EUR',
-      key: 'VOTRE_CLE_API_TEST',
+      currency: "EUR",
+      key: "VOTRE_CLE_API_TEST",
       amount: amount.toString(), // Utilisez le montant passé en prop
-      name: 'TERROTERRO',
+      name: "TERROTERRO",
       prefill: {
-        email: 'test@example.com',
-        contact: '9191919191',
-        name: 'Client Test'
+        email: "test@example.com",
+        contact: "9191919191",
+        name: "Client Test",
       },
-      theme: {color: Colors.danger}
-    }
+      theme: { color: Colors.danger },
+    };
 
-    RazorpayCheckout.open(options).then((data) => {
-      // Paiement réussi
-      onSuccess(data.razorpay_payment_id);
-    }).catch((error) => {
-      // Erreur dans le processus de paiement
-      alert(`Erreur: ${error.code} | ${error.description}`);
-    });
+    RazorpayCheckout.open(options)
+      .then((data) => {
+        // Paiement réussi
+        onSuccess(data.razorpay_payment_id);
+      })
+      .catch((error) => {
+        // Erreur dans le processus de paiement
+        alert(`Erreur: ${error.code} | ${error.description}`);
+      });
   };
 
   return (
@@ -43,14 +45,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.danger,
     padding: 15,
     borderRadius: 5,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: 15,
     marginBottom: 20,
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

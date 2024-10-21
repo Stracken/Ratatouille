@@ -1,11 +1,28 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Animated, FlatList, Modal, ActivityIndicator } from "react-native";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TextInput,
+  TouchableOpacity,
+  Animated,
+  FlatList,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import { Image } from "react-native";
 import Colors from "../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Keyboard } from "react-native";
-import { API_URL } from '../config';
-import { useNavigation } from '@react-navigation/native';
+import { API_URL } from "../config";
+import { useNavigation } from "@react-navigation/native";
 
 const ListItem = React.memo(({ item, onPress }) => (
   <TouchableOpacity style={styles.resultItem} onPress={() => onPress(item)}>
@@ -13,19 +30,22 @@ const ListItem = React.memo(({ item, onPress }) => (
   </TouchableOpacity>
 ));
 
-const CustomHeader = ({ openModal}) => {
+const CustomHeader = ({ openModal }) => {
   const navigation = useNavigation();
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const animatedHeight = useRef(new Animated.Value(60)).current;
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setIsSearchActive(false);
-    });
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIsSearchActive(false);
+      }
+    );
     return () => {
       keyboardDidHideListener.remove();
     };
@@ -42,36 +62,39 @@ const CustomHeader = ({ openModal}) => {
   const toggleSearch = () => {
     setIsSearchActive(!isSearchActive);
     if (!isSearchActive) {
-      setSearchQuery('');
+      setSearchQuery("");
       setSearchResults([]);
     }
   };
 
-  const searchProducts = useCallback(async (query) => {
-    if (query.length > 2) {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`${API_URL}/search-products?q=${query}`);
-        const data = await response.json();
-        if (data.products && Array.isArray(data.products)) {
-          // Filtrer les résultats côté client si nécessaire
-          const filteredResults = data.products.filter(product => 
-            product.nom.toLowerCase().includes(query.toLowerCase())
-          );
-          navigation.navigate('Search', {
-            screen: 'SearchResults',
-            params: { searchResults: filteredResults, searchQuery: query }
-          });
-        } else {
-          console.error("Format de données inattendu:", data);
+  const searchProducts = useCallback(
+    async (query) => {
+      if (query.length > 2) {
+        setIsLoading(true);
+        try {
+          const response = await fetch(`${API_URL}/search-products?q=${query}`);
+          const data = await response.json();
+          if (data.products && Array.isArray(data.products)) {
+            // Filtrer les résultats côté client si nécessaire
+            const filteredResults = data.products.filter((product) =>
+              product.nom.toLowerCase().includes(query.toLowerCase())
+            );
+            navigation.navigate("Search", {
+              screen: "SearchResults",
+              params: { searchResults: filteredResults, searchQuery: query },
+            });
+          } else {
+            console.error("Format de données inattendu:", data);
+          }
+        } catch (error) {
+          console.error("Erreur lors de la recherche:", error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Erreur lors de la recherche:", error);
-      } finally {
-        setIsLoading(false);
       }
-    }
-  }, [navigation]);
+    },
+    [navigation]
+  );
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -89,22 +112,26 @@ const CustomHeader = ({ openModal}) => {
     // navigation.navigate('ProductDetails', { productId: item.id });
   }, []);
 
-  const renderItem = useCallback(({ item }) => (
-    <ListItem item={item} onPress={handleItemPress} />
-  ), [handleItemPress]);
+  const renderItem = useCallback(
+    ({ item }) => <ListItem item={item} onPress={handleItemPress} />,
+    [handleItemPress]
+  );
 
   const keyExtractor = useCallback((item) => item.id.toString(), []);
 
-  const getItemLayout = useCallback((data, index) => ({
-    length: 50, // Hauteur estimée de chaque élément
-    offset: 50 * index,
-    index,
-  }), []);
+  const getItemLayout = useCallback(
+    (data, index) => ({
+      length: 50, // Hauteur estimée de chaque élément
+      offset: 50 * index,
+      index,
+    }),
+    []
+  );
 
   const memoizedSearchResults = useMemo(() => searchResults, [searchResults]);
 
-return (
-  <SafeAreaView style={styles.safeArea}>
+  return (
+    <SafeAreaView style={styles.safeArea}>
       <Animated.View style={[styles.container, { height: animatedHeight }]}>
         <View style={styles.topRow}>
           <Image
@@ -115,8 +142,8 @@ return (
           <TouchableOpacity onPress={toggleSearch} style={styles.searchButton}>
             <Ionicons name="search-outline" size={24} color={Colors.white} />
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.profileIcon} 
+          <TouchableOpacity
+            style={styles.profileIcon}
             onPress={openModal}
             accessible={true}
             accessibilityLabel="Bouton d'accessibilité"
@@ -128,10 +155,15 @@ return (
         </View>
         {isSearchActive && (
           <View style={styles.searchContainer}>
-            <Ionicons name="search-outline" size={20} color={Colors.danger} style={styles.searchIcon} />
-            <TextInput 
-              style={styles.input} 
-              placeholderTextColor={Colors.black} 
+            <Ionicons
+              name="search-outline"
+              size={20}
+              color={Colors.danger}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={Colors.black}
               placeholder="Agriculteurs, Producteurs, ..."
               autoFocus
               value={searchQuery}
@@ -164,7 +196,7 @@ return (
           ) : (
             <Text style={styles.noResultsText}>Aucun résultat trouvé</Text>
           )}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setIsModalVisible(false)}
           >
@@ -185,21 +217,21 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.greenAgri,
     paddingHorizontal: 15,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   topRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: 'space-evenly',
-    
+    justifyContent: "space-evenly",
+
     height: 40,
-    marginBottom:10
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
     color: Colors.black,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
+    fontWeight: "bold",
+    fontStyle: "italic",
     flex: 1,
     marginHorizontal: 10,
   },
@@ -215,8 +247,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: Colors.fakeWhite,
     borderRadius: 10,
     marginTop: 5,
@@ -233,32 +265,32 @@ const styles = StyleSheet.create({
     color: Colors.danger,
   },
   resultsList: {
-    position: 'absolute',
+    position: "absolute",
     top: 110, // Ajustez selon vos besoins
     left: 0,
     right: 0,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     zIndex: 1000,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
     paddingTop: 50,
   },
   resultItem: {
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: 'white',
+    borderBottomColor: "#eee",
+    backgroundColor: "white",
   },
   closeButton: {
     backgroundColor: Colors.danger,
     padding: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
 });

@@ -10,8 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null);
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-  
-
 
   useEffect(() => {
     checkToken();
@@ -48,9 +46,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
- 
-
-  
   const signOut = async () => {
     try {
       await AsyncStorage.removeItem("userToken");
@@ -76,42 +71,42 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const useProducts = (userId) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  
-const useProducts = (userId) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchProducts = async () => {
-    if (!userId) {
-      setError('UserId non défini');
-      setLoading(false);
-      return;
-    }
-    try {
-      setLoading(true);
-      const response = await axios.get(`${API_URL}/products/${userId}`);
-      if (response.data.products) {
-        setProducts(response.data.products);
-      } else {
-        setProducts([]);
+    const fetchProducts = async () => {
+      if (!userId) {
+        setError("UserId non défini");
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      setError(err.response?.data?.error || 'Erreur lors de la récupération des produits');
-      console.error('Erreur lors de la récupération des produits:', err);
-    } finally {
-      setLoading(false);
-    }
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_URL}/products/${userId}`);
+        if (response.data.products) {
+          setProducts(response.data.products);
+        } else {
+          setProducts([]);
+        }
+      } catch (err) {
+        setError(
+          err.response?.data?.error ||
+            "Erreur lors de la récupération des produits"
+        );
+        console.error("Erreur lors de la récupération des produits:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      fetchProducts();
+    }, [userId]);
+
+    return { products, loading, error, refetch: fetchProducts };
   };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [userId]);
-
-  return { products, loading, error, refetch: fetchProducts };
-};
-
 
   const clearError = () => setError(null);
 
@@ -126,7 +121,7 @@ const useProducts = (userId) => {
         signOut,
         signUpUser,
         clearError,
-        useProducts
+        useProducts,
       }}
     >
       {children}

@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
 const ProductDetails = ({ route }) => {
-  const {product, cart} = route.params;
+  const {product} = route.params;
 
   return (
     <ScrollView style={styles.container}>
@@ -46,7 +46,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardProductDetail:{
-    paddingBottom:20
+    paddingBottom:20,
+    paddingHorizontal:20
   },
   image: {
     width: '100%',

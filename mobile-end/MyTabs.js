@@ -2,7 +2,8 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "react-native-vector-icons/Ionicons";
+
 import Colors from "./constants/Colors";
 import { useCart } from "./components/CartContext";
 import { useNavigation } from "@react-navigation/native";
@@ -19,7 +20,7 @@ import ProductDetails from "./screens/ProductDetails";
 import { useAuth } from "./context/AuthContext";
 import ProductManagementScreen from "./screens/ProduitManagementScreen";
 import SearchResults from "./components/SearchResults";
-import { HeaderBackButton } from '@react-navigation/elements';
+import { HeaderBackButton } from "@react-navigation/elements";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -27,10 +28,7 @@ const Stack = createStackNavigator();
 const commonProductDetailsOptions = ({ navigation }) => ({
   headerShown: true,
   headerLeft: (props) => (
-    <HeaderBackButton
-      {...props}
-      onPress={() => navigation.goBack()}
-    />
+    <HeaderBackButton {...props} onPress={() => navigation.goBack()} />
   ),
   title: "Détails du produit",
 });
@@ -42,7 +40,11 @@ const HomeStack = () => (
       component={Home}
       options={{ headerShown: false }}
     />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} options={commonProductDetailsOptions}/>
+    <Stack.Screen
+      name="ProductDetails"
+      component={ProductDetails}
+      options={commonProductDetailsOptions}
+    />
   </Stack.Navigator>
 );
 
@@ -63,8 +65,11 @@ const ProductsStack = () => (
       component={Products}
       options={{ headerShown: false }}
     />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} options={commonProductDetailsOptions} />
-    
+    <Stack.Screen
+      name="ProductDetails"
+      component={ProductDetails}
+      options={commonProductDetailsOptions}
+    />
   </Stack.Navigator>
 );
 
@@ -80,12 +85,13 @@ const BuyPageStack = () => (
 
 const ResultsStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
-<Stack.Screen 
-      name="SearchResults" 
+    <Stack.Screen
+      name="SearchResults"
       component={SearchResults}
       options={{ title: "R\u00E9sultats de recherche" }}
     />
-</Stack.Navigator>)
+  </Stack.Navigator>
+);
 const AboutStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
     <Stack.Screen

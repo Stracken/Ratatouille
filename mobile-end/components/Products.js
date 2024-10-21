@@ -15,19 +15,18 @@ import Colors from "../constants/Colors";
 import axios from "axios";
 import { API_URL } from "../config";
 
-const Products = ({route}) => {
+const Products = ({ route }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [categoryFilter, setCategoryFilter] = useState(selectedCategory || 'Tous les produits');
+  const [categoryFilter, setCategoryFilter] = useState(
+    selectedCategory || "Tous les produits"
+  );
   const navigation = useNavigation();
   const { cart, addToCart, updateCartItemQuantity } = useCart();
   const ALL_CATEGORIES = "Tous les produits";
 
-  const {selectedCategory} = route.params || {};
-
- 
- 
+  const { selectedCategory } = route.params || {};
 
   const sortProducts = (order) => {
     const sorted = [...filteredProducts].sort((a, b) => {
@@ -38,42 +37,46 @@ const Products = ({route}) => {
   };
 
   const filterByCategory = (category) => {
-    if (category === 'Tous les produits') {
-        setFilteredProducts(products);
+    if (category === "Tous les produits") {
+      setFilteredProducts(products);
     } else {
-        const filtered = products.filter(product => product.categorie === category);
-        setFilteredProducts(filtered);
+      const filtered = products.filter(
+        (product) => product.categorie === category
+      );
+      setFilteredProducts(filtered);
     }
     setCategoryFilter(category);
-};
+  };
 
-useEffect(() => {
-  fetchProduct();
-  console.log('fetchProduct',selectedCategory);
-}, []);
+  useEffect(() => {
+    fetchProduct();
+    console.log("fetchProduct", selectedCategory);
+  }, []);
 
-useEffect(() => {
-  console.log(selectedCategory);
-  
-  if (selectedCategory && selectedCategory !== 'Tous les produits') {
+  useEffect(() => {
+    console.log(selectedCategory);
+
+    if (selectedCategory && selectedCategory !== "Tous les produits") {
       filterByCategory(selectedCategory);
-  }
-}, [selectedCategory, products]);
+    }
+  }, [selectedCategory, products]);
 
-const fetchProduct = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/product`);
-    setProducts(response.data.products);
-    if (selectedCategory && selectedCategory !== 'Tous les produits') {
-      const filtered = response.data.products.filter(product => product.categorie === selectedCategory);
-      setFilteredProducts(filtered);
-  } else {
-      setFilteredProducts(response.data.products);
-  }
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits:", error);
-  }
-};
+  const fetchProduct = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/product`);
+      setProducts(response.data.products);
+      if (selectedCategory && selectedCategory !== "Tous les produits") {
+        const filtered = response.data.products.filter(
+          (product) => product.categorie === selectedCategory
+        );
+        setFilteredProducts(filtered);
+      } else {
+        setFilteredProducts(response.data.products);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des produits:", error);
+    }
+  };
 
   const handleAddToCart = (product, quantity) => {
     addToCart(product, quantity);
@@ -114,7 +117,7 @@ const fetchProduct = async () => {
             label={ALL_CATEGORIES}
             value={ALL_CATEGORIES}
           />
-           {/* {categories.map((category) => (
+          {/* {categories.map((category) => (
                     <Picker.Item 
                         key={category} 
                         label={category === 'Tous les produits' ? category : category.charAt(0).toUpperCase() + category.slice(1)} 
@@ -141,8 +144,8 @@ const fetchProduct = async () => {
               price: item.prix,
               quantity: item.quantite,
               description: item.description,
-              images: item.images, 
-              userId: item.user_id
+              images: item.images,
+              userId: item.user_id,
             }}
             addToCart={handleAddToCart}
             updateCartItemQuantity={updateCartItemQuantity}

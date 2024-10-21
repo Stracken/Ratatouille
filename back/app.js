@@ -202,35 +202,35 @@ app.get('/produit/:id', (req, res) => {
 ///////////////////////////////////////////////// MOBILE //////////////////////////////////////////////////////////////////////
 
 // Routes
-app.get('/products/:userId', async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    console.log('Received product request for user:', userId);
+// app.get('/products/:userId', async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     console.log('Received product request for user:', userId);
 
-    if (!userId) {
-      return res.status(400).json({ error: 'UserId est requis' });
-    }
+//     if (!userId) {
+//       return res.status(400).json({ error: 'UserId est requis' });
+//     }
 
-    pool.query(
-      'SELECT * FROM produit WHERE user_id = ?',
-      [userId],
-      (err, results) => {
-        if (err) {
-          console.error("Erreur lors de la récupération des produits:", err);
-          return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
-        }
+//     pool.query(
+//       'SELECT * FROM produit WHERE user_id = ?',
+//       [userId],
+//       (err, results) => {
+//         if (err) {
+//           console.error("Erreur lors de la récupération des produits:", err);
+//           return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
+//         }
 
-        res.status(200).json({
-          message: results.length > 0 ? 'Produits récupérés avec succès' : 'Aucun produit trouvé pour cet utilisateur',
-          products: results
-        });
-      }
-    );
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits:", error);
-    res.status(500).json({ error: 'Erreur interne du serveur' });
-  }
-});
+//         res.status(200).json({
+//           message: results.length > 0 ? 'Produits récupérés avec succès' : 'Aucun produit trouvé pour cet utilisateur',
+//           products: results
+//         });
+//       }
+//     );
+//   } catch (error) {
+//     console.error("Erreur lors de la récupération des produits:", error);
+//     res.status(500).json({ error: 'Erreur interne du serveur' });
+//   }
+// });
 
 ////////////                           INSCRIPTION /////
 
