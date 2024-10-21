@@ -25,7 +25,7 @@ body {
     margin-top: 5.5vw;
     margin-left: 0.5vw;
     border-radius: 10px;
-  }
+}
 
 .sug{
     color: white;
@@ -238,21 +238,21 @@ body {
 }
 
 .cardsection {
-    margin: 10px 0; /* Espacement entre les sections de la carte */
+    margin: 10px 0; 
 }
 
 .cardsection h1 {
-    font-size: 1.5em; /* Taille de la police pour le nom */
-    margin-bottom: 5px; /* Marge en bas du nom */
+    font-size: 1.5em; 
+    margin-bottom: 5px; 
 }
 
 .cardsection h2 {
-    font-size: 1em; /* Taille de la police pour les autres informations */
-    margin: 5px 0; /* Espacement vertical */
+    font-size: 1em; 
+    margin: 5px 0; 
 }
 
 .produit {
-    width: 90%; /* modifié de 95% à 90% */
+    width: 90%; 
     height: auto;
     min-height: 30%;
     display: flex;
@@ -260,11 +260,13 @@ body {
     border-radius: 2vw;
     margin-left: 2.5%;
     margin-top: 3%;
-  }
+}
 
 .description{
     display: flex;
     flex-direction: column;
+    margin-top: 20px;
+    margin-bottom: 20px;
     width: 55%;
     height: 100%;
     justify-content: center;
@@ -375,74 +377,6 @@ body {
     }
     img:hover{
         background-color: #a00000;
-    }
-}
-
-.panier{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 30vw;
-    justify-content: center;
-    align-items: center;
-    
-    h1{
-        font-size: 1.5vw;
-        font-weight: bold;
-    }
-    h2{
-        font-size: larger;
-        font-weight: bold;
-    }
-    .achat{
-        width: 80%;
-        min-height: 30vw;
-        display: flex;
-        background-color: #F0F0F0;
-        border-radius: 2vw;
-        margin-top: 2%;
-    }
-    .description{
-        display: flex;
-        align-items: baseline;
-        margin-left: 2%;
-        margin-top: 2%;
-        margin-bottom: 2%;
-        width: 60%;
-        h1{
-            font-size: x-large;
-        }
-    }
-    .produit_panier{
-        display: flex;
-        width: 100%;
-        height: 10vw;
-        margin-top: 2%;
-    }
-    .wham{
-        width: 50%;
-        height: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .d{
-        display: flex;
-        flex-direction: column;
-        width: 30%;
-        height: 100%;
-        align-items: center;
-        justify-content: space-around;
-    }
-    .text{
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-        width:50%;
-        h1{
-            font-size: x-large;
-            margin-top: 5%;
-        }
     }
 }
 
@@ -755,4 +689,105 @@ button[type="submit"]:hover {
 .product-card button:hover {
     background-color: #218838;
     transform: scale(1.05); 
+}
+
+.success-message {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* panier.css */
+
+.cart-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.cart-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.cart-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart-items {
+    flex: 3;
+    margin-right: 20px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item img {
+    border-radius: 8px;
+    margin-right: 15px;
+    width: auto;
+    height: 150px;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-name {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.item-price {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.item-quantity {
+    font-size: 1rem;
+    color: #666;
+}
+
+.remove-button {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.cart-summary {
+    flex: 1;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.summary-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.total-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.clear-cart-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1rem;
 }

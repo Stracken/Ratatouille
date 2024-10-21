@@ -28,6 +28,40 @@ export const signup = (userData) => {
   return api.post('/signup', userData);
 };
 
+export const getCart = () => {
+  const cart = localStorage.getItem('cart');
+  return cart ? JSON.parse(cart) : [];
+};
+
+export const addToCart = (product) => {
+  const cart = getCart();
+  const existingProduct = cart.find(item => item.id === product.id);
+  if (existingProduct) {
+    existingProduct.quantity += product.quantity;
+  } else {
+    cart.push(product);
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+};
+
+export const removeFromCart = (id) => {
+  const cart = getCart().filter(item => item.id !== id);
+  localStorage.setItem('cart', JSON.stringify(cart));
+};
+
+export const clearCart = () => {
+  localStorage.removeItem('cart');
+};
+
+export const updateQuantity = (id, quantity) => {
+  const cart = getCart();
+  const existingProduct = cart.find(item => item.id === id);
+  if (existingProduct) {
+    existingProduct.quantity = quantity; // Met à jour la quantité
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }
+};
+
 export const addProduct = (productData) => {
   return api.post('/produit', productData);
 };
