@@ -165,7 +165,7 @@ function MyTabs() {
           options={{
             tabBarLabel: "Gestion produitss",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="nutrition" size={20} color={color} />
+              <Ionicons name="cog" size={20} color={color} />
             ),
           }}
         />

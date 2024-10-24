@@ -12,16 +12,14 @@ import {
 import Colors from "../constants/Colors";
 import { signUp } from "../api/api";
 
-const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
+const SignUpScreen = ({ navigation}) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
-  // const [userType, setUserType] = useState("");
   const [password, setPassword] = useState("");
   const [address, setAddress] = useState("");
   const [ville, setVille] = useState("");
-  // const [companyName, setCompanyName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [postalCode, setPostalCode] = useState("");
   const [role, setRole] = useState("client");
@@ -46,10 +44,17 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
       Alert.alert("Erreur", "Raison sociale est requis pour les vendeurs");
       return false;
     }
+//     \S+ : Correspond à un ou plusieurs caractères non blancs (c'est-à-dire tout caractère sauf les espaces).
+// @ : Vérifie la présence du symbole "@".
+// \. : Vérifie la présence d'un point "." après le nom de domaine.
+// .test(email) : Cette méthode teste si la chaîne email correspond à l'expression régulière. Si ce n'est pas le cas, elle renvoie false.
     if (!/\S+@\S+\.\S+/.test(email)) {
       Alert.alert("Erreur", "Veuillez entrer une adresse email valide");
       return false;
     }
+//     ^ : Indique le début de la chaîne.
+// [0-9]{5} : Correspond exactement à cinq chiffres (0-9).
+// $ : Indique la fin de la chaîne.
     if (!/^[0-9]{5}$/.test(postalCode)) {
       Alert.alert("Erreur", "Code postal invalide");
       return false;
@@ -69,7 +74,6 @@ const SignUpScreen = ({ onBackToSignIn ,navigation}) => {
   };
   const handleSignUp = async () => {
     if (!validateForm()) return;
-
     setIsLoading(true);
     setError(null); // Réinitialiser l'erreur au début de chaque tentative d'inscription
     try {

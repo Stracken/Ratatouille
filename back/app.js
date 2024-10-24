@@ -1,239 +1,202 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const express = require("express");
+const mysql = require("mysql2");
+const cors = require("cors");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const app = express();
-const port = 3001; 
-const multer = require('multer');
+const port = 3001;
+const multer = require("multer");
 const upload = multer();
-const stripe = require('stripe')('sk_test_51PfNmyRpKgZkfjqiKOClHuOcFVUgJPdk5OqpYGCNHVPUBugcz2RpBOiTLYpNweAOtrJMS2Q6DXR5o3dl1d2tXQ6e00A9T86gec');
-
+const stripe = require("stripe")(
+  "sk_test_51PfNmyRpKgZkfjqiKOClHuOcFVUgJPdk5OqpYGCNHVPUBugcz2RpBOiTLYpNweAOtrJMS2Q6DXR5o3dl1d2tXQ6e00A9T86gec"
+);
 
 // Configuration de la connexion à la base de données
 const pool = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ratatouille',
-    connectTimeout: 60000, // Augmente le délai d'attente à 60 secondes
-    connectionLimit: 10,
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "ratatouille",
+  connectTimeout: 60000, // Augmente le délai d'attente à 60 secondes
+  connectionLimit: 10,
 });
 
-// const db = mysql.createPool({
-//   host: 'localhost',
-//   user: 'root',
-//   password: '',
-//   database: 'ratatouille',
-// });
-// Configuration CORS pour accepter toutes les origines
-const corsOptions =  {
-    origin: '*',
-    methods: ['GET','PUT','POST','DELETE'],
-    credentials: true
-  };
 
+// Configuration CORS pour accepter toutes les origines
+const corsOptions = {
+  origin: "*",
+  methods: ["GET", "PUT", "POST", "DELETE"],
+  credentials: true,
+};
 
 // Connexion à la base de données
-// Utilisez pool.query au lieu de connection.query
 pool.connect((err) => {
   if (err) {
-    console.error('Erreur de connexion à la base de données :', err);
-    // Tentative de reconnexion ou autre logique de gestion d'erreur
+    console.error("Erreur de connexion à la base de données :", err);
     return;
-}
-console.log('Connecté à la base de données MySQL');
+  }
+  console.log("Connecté à la base de données MySQL");
 });
 
 // Middleware
 app.use(cors(corsOptions)); // Permet les requêtes cross-origin
 app.use(express.json());
 
-// Vérification de la connexion au démarrage (facultatif)
-// (async () => {
-//   try {
-//       const connection = await pool.getConnection();
-//       console.log('Connecté à la base de données MySQL');
-//       connection.release(); // Libération de la connexion après vérification
-//   } catch (err) {
-//       console.error('Erreur de connexion à la base de données :', err);
-//       process.exit(1); // Arrête le serveur si la connexion échoue
-//   }
-// })();
 
 
 ////////////////////////////////////////////////////// FRONNTT //////////////////////////////////////////////////////
 
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, 'votre_secret_jwt', (err, user) => {
-      if (err) return res.sendStatus(403);
-      req.user = user;
-      next();
+  jwt.verify(token, "votre_secret_jwt", (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
   });
 };
 
-app.post('/logup', async (req, res) => {
+app.post("/logup", async (req, res) => {
   try {
-      const { email, password, nom, prenom, adresse, ville, code_postal, telephone } = req.body;
-      console.log('Received signup request:', email, nom, prenom);
+    const {
+      email,
+      password,
+      nom,
+      prenom,
+      adresse,
+      ville,
+      code_postal,
+      telephone,
+    } = req.body;
+    console.log("Received signup request:", email, nom, prenom);
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      console.log('Hashed password:', hashedPassword);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Hashed password:", hashedPassword);
 
-      pool.query(
-          'INSERT INTO user (email, mot_de_passe, role, nom, prenom, adresse, ville, code_postal, telephone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-          [email, hashedPassword, 'client', nom, prenom, adresse, ville, code_postal, telephone],
-          (err, result) => {
-              if (err) {
-                  console.error('Error during signup:', err);
-                  res.status(500).json({ error: err.message });
-                  return;
-              }
-              console.log('Insert result:', result);
-              res.status(201).json({ message: 'Utilisateur créé avec succès' });
-          }
-      );
+    pool.query(
+      "INSERT INTO user (email, mot_de_passe, role, nom, prenom, adresse, ville, code_postal, telephone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        email,
+        hashedPassword,
+        "client",
+        nom,
+        prenom,
+        adresse,
+        ville,
+        code_postal,
+        telephone,
+      ],
+      (err, result) => {
+        if (err) {
+          console.error("Error during signup:", err);
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        console.log("Insert result:", result);
+        res.status(201).json({ message: "Utilisateur créé avec succès" });
+      }
+    );
   } catch (error) {
-      console.error('Error during signup:', error);
-      res.status(500).json({ error: error.message });
+    console.error("Error during signup:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.post('/login', (req, res) => {
+app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  pool.query(
-      'SELECT * FROM user WHERE email = ?',
-      [email],
-      (err, rows) => {
-          if (err) {
-              console.error('Error during login:', err);
-              res.status(500).json({ error: err.message });
-              return;
-          }
-          if (rows.length === 0) {
-              return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-          }
+  pool.query("SELECT * FROM user WHERE email = ?", [email], (err, rows) => {
+    if (err) {
+      console.error("Error during login:", err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (rows.length === 0) {
+      return res.status(401).json({ error: "Email ou mot de passe incorrect" });
+    }
 
-          const user = rows[0];
-          bcrypt.compare(password, user.mot_de_passe, (err, validPassword) => {
-              if (err) {
-                  console.error('Error during login:', err);
-                  res.status(500).json({ error: err.message });
-                  return;
-              }
-              if (!validPassword) {
-                  return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-              }
-
-              const token = jwt.sign({ userId: user.id, role: user.role }, 'votre_secret_jwt', { expiresIn: '1h' });
-              res.json({ token, role: user.role });
-          });
+    const user = rows[0];
+    bcrypt.compare(password, user.mot_de_passe, (err, validPassword) => {
+      if (err) {
+        console.error("Error during login:", err);
+        res.status(500).json({ error: err.message });
+        return;
       }
-  );
+      if (!validPassword) {
+        return res
+          .status(401)
+          .json({ error: "Email ou mot de passe incorrect" });
+      }
+
+      const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        "votre_secret_jwt",
+        { expiresIn: "1h" }
+      );
+      res.json({ token, role: user.role });
+    });
+  });
 });
 
 // Nouvelle route pour ajouter un produit
-app.post('/produit', authenticateToken, (req, res) => {
+app.post("/produit", authenticateToken, (req, res) => {
   const { nom, categorie, images, prix, quantite, description } = req.body;
   const userId = req.user.userId;
 
   pool.query(
-      'INSERT INTO produit (nom, categorie, images, prix, quantite, description, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [nom, categorie, images, prix, quantite, description, userId],
-      (err, result) => {
-          if (err) {
-              console.error('Error adding product:', err);
-              res.status(500).json({ error: err.message });
-              return;
-          }
-          res.status(201).json({ message: 'Produit ajouté avec succès', productId: result.insertId });
-      }
-  );
-});
-
-// Nouvelle route pour consulter tous les produits
-app.get('/produits/all', (req, res) => {
-  pool.query(
-      'SELECT * FROM produit',
-      (err, rows) => {
-          if (err) {
-              console.error('Error fetching products:', err);
-              res.status(500).json({ error: err.message });
-              return;
-          }
-      res.json(rows);
-      }
-  );
-});
-
-app.get('/produit/:id', (req, res) => {
-  const id = req.params.id;
-  pool.query(
-    'SELECT * FROM produit WHERE id = ?',
-    [id],
-    (err, rows) => {
+    "INSERT INTO produit (nom, categorie, images, prix, quantite, description, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [nom, categorie, images, prix, quantite, description, userId],
+    (err, result) => {
       if (err) {
-        console.error('Error fetching product:', err);
+        console.error("Error adding product:", err);
         res.status(500).json({ error: err.message });
         return;
       }
-      if (rows.length === 0) {
-        res.status(404).json({ error: 'Produit non trouvé' });
-        return;
-      }
-      const product = rows[0];
-      res.json(product);
+      res
+        .status(201)
+        .json({
+          message: "Produit ajouté avec succès",
+          productId: result.insertId,
+        });
     }
   );
 });
 
+// Nouvelle route pour consulter tous les produits
+app.get("/produits/all", (req, res) => {
+  pool.query("SELECT * FROM produit", (err, rows) => {
+    if (err) {
+      console.error("Error fetching products:", err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+});
 
-
-
-
-
-
+app.get("/produit/:id", (req, res) => {
+  const id = req.params.id;
+  pool.query("SELECT * FROM produit WHERE id = ?", [id], (err, rows) => {
+    if (err) {
+      console.error("Error fetching product:", err);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Produit non trouvé" });
+      return;
+    }
+    const product = rows[0];
+    res.json(product);
+  });
+});
 
 ///////////////////////////////////////////////// MOBILE //////////////////////////////////////////////////////////////////////
 
-// Routes
-// app.get('/products/:userId', async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-//     console.log('Received product request for user:', userId);
-
-//     if (!userId) {
-//       return res.status(400).json({ error: 'UserId est requis' });
-//     }
-
-//     pool.query(
-//       'SELECT * FROM produit WHERE user_id = ?',
-//       [userId],
-//       (err, results) => {
-//         if (err) {
-//           console.error("Erreur lors de la récupération des produits:", err);
-//           return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
-//         }
-
-//         res.status(200).json({
-//           message: results.length > 0 ? 'Produits récupérés avec succès' : 'Aucun produit trouvé pour cet utilisateur',
-//           products: results
-//         });
-//       }
-//     );
-//   } catch (error) {
-//     console.error("Erreur lors de la récupération des produits:", error);
-//     res.status(500).json({ error: 'Erreur interne du serveur' });
-//   }
-// });
 
 ////////////                           INSCRIPTION /////
-
 app.post('/signup', async (req, res) => {
   try {
       const { firstName, lastName, email, password, telephone, address, ville, postalCode, role, raisonSociale } = req.body;
@@ -357,7 +320,7 @@ app.post('/signup', async (req, res) => {
         );
       });
 
-   // Dans votre fichier principal d'application
+   
    app.get('/:categorie', async (req, res) => {
     try {
       // Récupération de tous les produits depuis la base de données
@@ -385,6 +348,8 @@ app.post('/signup', async (req, res) => {
       res.status(500).json({ error: 'Erreur interne du serveur' });
     }
   });
+
+//lire tous les produits par tout utilisateur (avec un filtre prédéfinini du plus récent au plus ancien)
 app.get('/product', async (req, res) => {
   try {
     // Récupération de tous les produits depuis la base de données
@@ -445,6 +410,7 @@ app.get('/search-products', async (req, res) => {
     res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
+
 app.get('/produit/', async (req, res) => {
   try {
     // Récupération de tous les produits depuis la base de données
@@ -474,45 +440,7 @@ app.get('/produit/', async (req, res) => {
 });
 
 ////////////                       CRUD PRODUIT  MANAGEMENT/////
-// app.get('/products/:userId', async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-    
-//     console.log('Received product request for user:', userId);
-
-//     if (!userId) {
-//       return res.status(400).json({ error: 'UserId est requis' });
-//     }
-
-//     pool.query(
-//       'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit WHERE user_id = ? ORDER BY date_creation DESC',
-//       [userId],
-//       (err, results) => {
-//         if (err) {
-//           console.error("Erreur lors de la récupération des produits:", err);
-//           return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
-//         }
-
-//         if (results.length === 0) {
-//           return res.status(404).json({ message: 'Aucun produit trouvé pour cet utilisateur' });
-//         }
-
-//         const productsWithImages = results.map(product => ({
-//           ...product,
-//           images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
-//         }));
-
-//         res.status(200).json({
-//           message: 'Produits récupérés avec succès',
-//           products: productsWithImages
-//         });
-//       }
-//     );
-//   } catch (error) {
-//     console.error("Erreur lors de la récupération des produits:", error);
-//     res.status(500).json({ error: 'Erreur interne du serveur' });
-//   }
-// });
+// Lire un product ajouté par l'identifiant
 app.get('/products/:userId', async (req, res) => {
     try {
       const userId = req.params.userId;
@@ -566,86 +494,21 @@ app.get('/products/:userId', async (req, res) => {
       res.status(500).json({ error: 'Erreur interne du serveur' });
     }
   });
-// app.get('/products/:userId', async (req, res) => {
-//   try {
-    
-//     const userId = req.params.userId;
-    
-//     // Log de la requête reçue
-//     console.log('Received product request for user:', userId);
-
-//     // Vérification que l'userId est présent
-//     if (!userId) {
-//       return res.status(400).json({ error: 'UserId est requis' });
-//     }
-
-//     // Récupération des produits depuis la base de données
-//     pool.query(
-//       'SELECT * FROM produit WHERE user_id = ?',
-//       [userId],
-//       (err, results) => {
-//         if (err) {
-//           console.error("Erreur lors de la récupération des produits:", err);
-//           return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
-//         }
-
-//         // Si aucun produit n'est trouvé, renvoyer un message approprié
-//         if (results.length === 0) {
-//           return res.status(404).json({ message: 'Aucun produit trouvé pour cet utilisateur' });
-//         }
-
-//         // Convertir les images en Base64
-//         const productsWithImages = results.map(product => ({
-//           ...product,
-//           images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
-//         }));
-//         // Renvoyer les produits trouvés
-//         res.status(200).json({
-//           message: 'Produits récupérés avec succès',
-//           products: productsWithImages
-//         });
-//       }
-//     );
-//   } catch (error) {
-//     console.error("Erreur lors de la récupération des produits:", error);
-//     res.status(500).json({ error: 'Erreur interne du serveur' });
-//   }
-// });
-// Add a new product
-
-// app.post('/products', upload.single('images'), async (req, res) => {
-//   const {nom, categorie, prix, quantite, description } = req.body;
-//   const user_id = req.body.user_id; // Assurez-vous que user_id est bien envoyé dans le corps de la requête
-
-//   // Vérification des champs requis
-//   if (!user_id || !nom || !categorie || !prix || !quantite || !description) {
-//     return res.status(400).json({ message: 'Tous les champs requis doivent être remplis' });
-//   }
-
-//   // Vérification de l'image
-//   if (!req.file) {
-//     return res.status(400).json({ message: 'L\'image est requise' });
-//   }
-
-//   const images = req.file.buffer;
-  
-
-//   const query = 'INSERT INTO produit (user_id, nom, categorie, images, prix, quantite, description, date_creation) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())';
-  
-//     pool.query(query, [user_id, nom, categorie, images, prix, quantite, description], (error, results) => {
-//     if (error) {
-//       console.error('Erreur lors de l\'ajout du produit:', error);
-//       return res.status(500).json({ message: 'Erreur serveur', error: error.message });
-//     }
-//     res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
-//   });
-// });
+// Ajouter un product
 app.post('/products/', upload.single('images'), async (req, res) => {
-  const {nom, categorie, prix, quantite, description } = req.body;
-  const user_id = req.body.user_id;
+  console.log('Données reçues:', req.body);
+  console.log('Fichier reçu:', req.file);
 
-  if (!user_id || !nom || !categorie || !prix || !quantite || !description) {
-    return res.status(400).json({ message: 'Tous les champs requis doivent être remplis' });
+  const { nom, categorie, description } = req.body;
+  const user_id = req.body.user_id;
+  
+  // Conversion des valeurs numériques
+  const prix = parseFloat(req.body.prix);
+  const quantite = parseInt(req.body.quantite, 10);
+
+  // Vérification que toutes les valeurs sont présentes et valides
+  if (!user_id || !nom || !categorie || isNaN(prix) || isNaN(quantite) || !description) {
+    return res.status(400).json({ message: 'Tous les champs requis doivent être remplis et valides' });
   }
 
   if (!req.file) {
@@ -654,43 +517,33 @@ app.post('/products/', upload.single('images'), async (req, res) => {
 
   let images;
   try {
-    // Conversion de l'image en base64
-    const imageBase64 = req.file.buffer.toString('base64');
-    // Vérification de la validité de la chaîne base64
-    if (imageBase64.length % 4 !== 0) {
-      return res.status(400).json({ message: 'L\'image fournie est invalide' });
-    }
-    images = `data:${req.file.mimetype};base64,${imageBase64}`;
-    console.log('Image data:', images.substring(0, 50) + '...');
+    // Utilisation directe du buffer de l'image pour MEDIUMBLOB
+    images = req.file.buffer;
+    
+    // Si vous avez besoin de vérifier le contenu de l'image, vous pouvez toujours le faire :
+    console.log('Image size:', images.length, 'bytes');
   } catch (error) {
     console.error('Erreur lors du traitement de l\'image:', error);
     return res.status(500).json({ message: 'Erreur lors du traitement de l\'image' });
   }
 
-  const query = 'INSERT INTO produit (user_id, nom, categorie, images, prix, quantite, description, date_creation) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())';
-  
-  pool.query(query, [user_id, nom, categorie, images, prix, quantite, description], (error, results) => {
-    if (error) {
-      console.error('Erreur lors de l\'ajout du produit:', error);
-      return res.status(500).json({ message: 'Erreur serveur', error: error.message });
-    }
-    res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
-  });
-});
-// app.post('/products', async (req, res) => {
-//   const { user_id, categorie, image, prix, quantite, description } = req.body;
-//   const query = 'INSERT INTO produit (user_id, categorie, image, prix, quantite, description, date_creation) VALUES (?, ?, ?, ?, ?, ?, NOW())';
-  
-//   pool.query(query, [user_id, categorie, image, prix, quantite, description], (error, results) => {
-//     if (error) {
-//       console.error('Erreur lors de l\'ajout du produit (post):', error);
-//       return res.status(500).json({ message: 'Erreur serveur' });
-//     }
-//     res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
-//   });
-// });
+  const query = "INSERT INTO produit (nom, categorie, images, prix, quantite, description, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-// Update a product
+  pool.query(
+    query,
+    [nom, categorie, images, prix, quantite, description, user_id], 
+    (error, results) => {
+      if (error) {
+        console.error('Erreur lors de l\'ajout du produit:', error);
+        return res.status(500).json({ message: 'Erreur serveur', error: error.message });
+      }
+      res.status(201).json({ message: 'Produit ajouté avec succès', productId: results.insertId });
+    }
+  );
+});
+
+
+// MAJ un product
 app.put('/products/:id',  upload.single('images'), async (req, res) => {
   const productId = req.params.id;
   const { categorie, prix, quantite, description } = req.body;
@@ -715,7 +568,7 @@ app.put('/products/:id',  upload.single('images'), async (req, res) => {
   });
 });
 
-// Delete a product
+// Supprimer un product
 app.delete('/products/:id', async (req, res) => {
   const productId = req.params.id;
   const query = 'DELETE FROM produit WHERE id = ?';
@@ -732,56 +585,7 @@ app.delete('/products/:id', async (req, res) => {
   });
 });
 
-//paiement /////////////////////////////////////////////////////////////
-// app.post('/create-payment-intent', async (req, res) => {
-//   const { amount } = req.body; // Montant en centimes
-
-//   try {
-//      const paymentIntent = await stripe.paymentIntents.create({
-//        amount,
-//        currency: 'eur', // ou la devise que vous utilisez
-//      });
-//      res.send({ clientSecret: paymentIntent.client_secret });
-    
-//  } catch (error) {
-//      res.status(500).send({ error });
-//  }
-// });
-
-// Endpoint pour créer une intention de paiement
-// Endpoint pour créer une intention de paiement
-// app.post('/create-payment-intent', async (req, res) => {
-//   const { items } = req.body;
-
-//   try {
-//     // Calculer le montant total
-//     let total = 0;
-//     for (const item of items) {
-//       const [rows] = await pool.promise().query('SELECT prix, quantite FROM produit WHERE id = ?', [item.id]);
-//       if (rows.length > 0) {
-//         const { prix, quantite } = rows[0];
-//         if (item.quantity > quantite) {
-//           return res.status(400).json({ error: `Quantité insuffisante pour le produit ${item.id}` });
-//         }
-//         total += prix * item.quantity;
-//       }
-//     }
-
-//     // Créer l'intention de paiement
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount: Math.round(total * 100), // Stripe utilise les centimes
-//       currency: 'eur',
-//     });
-
-//     // Envoyer la réponse avec le client secret
-//     return res.json({ clientSecret: paymentIntent.client_secret });
-    
-//   } catch (error) {
-//     console.error('Erreur lors de la création de l\'intention de paiement:', error);
-//     return res.status(500).json({ error: 'Erreur lors de la création de l\'intention de paiement' });
-//   }
-// });
-
+//intention de paiement
 app.post('/create-payment-intent', async (req, res) => {
   const { items } = req.body;
 
@@ -851,5 +655,5 @@ app.post('/update-quantities', async (req, res) => {
 
 // Démarrage du serveur
 app.listen(port, () => {
-    console.log(`Serveur en écoute sur le port ${port}`);
+  console.log(`Serveur en écoute sur le port ${port}`);
 });

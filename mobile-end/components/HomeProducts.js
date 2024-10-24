@@ -38,7 +38,7 @@ const HomeProducts = () => {
     // Vérifiez si l'URI est valide
     if (typeof imageUri !== "string") {
       console.error("URI d'image invalide:", imageUri);
-      return null; // ou une image par défaut
+      return null; 
     }
 
     return (

@@ -6,7 +6,7 @@ const Map = () => {
   return (
     <MapView
       width={100}
-      height={300}
+      height={301}
       frameborder={0}
       allowfullscreen
       allow="geolocation"

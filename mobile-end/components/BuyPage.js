@@ -51,6 +51,7 @@ const BuyPage = () => {
 //  
 useEffect(() => {
   const initializeStripe = async () => {
+    // {error} fait partie de la structure de retour de la fonction de stripe
     const { error } = await initStripe({
       publishableKey: 'pk_test_51PfNmyRpKgZkfjqiZU6RXcDkGN4tjVTxY5TA9twzE48MEUMQe8fQojaXd7wJWUaSbRg2jgHmprVUWBGvQ8v8b41K00NeOYreRk',
     });
@@ -99,16 +100,9 @@ useEffect(() => {
   
   useEffect(() => {
     initializePaymentSheet();
-  }, [cart]); // Réinitialiser le payment sheet quand le panier change
+  }, [cart]); // Réinitialiser le paymentsheet quand le panier change
     
-  // const openPaymentSheet = async () => {
-  //   if (!paymentSheetInitialized) {
-  //     console.error('Payment sheet not initialized');
-  //     alert('Le formulaire de paiement n\'est pas prêt. Veuillez réessayer.');
-  //     return;
-  //   }
-
-  //   const { error } = await presentPaymentSheet();
+  
   const openPaymentSheet = async () => {
     if (!paymentSheetInitialized) {
       console.error('Payment sheet not initialized');
@@ -141,9 +135,10 @@ useEffect(() => {
           items: cart.map(item => ({ id: item.id, quantity: item.selectedQuantity }))
         }),
       });
-  
+      // provient de l'objet Response dans l'API Fetch de JavaScript et est un booléen qui indique si la réponse d'une requête HTTP a été réussie
       if (!response.ok) {
         const errorResponse = await response.json();
+        // message d'erreur spécifique du serveur et vérifie le statut de la réponse avant de tenter de traiter les données, ce qui peut éviter des erreurs ultérieures lors du traitement de données invalides.
         throw new Error(errorResponse.error || 'Erreur lors de la mise à jour des quantités');
       }
   

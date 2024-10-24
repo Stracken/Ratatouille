@@ -33,7 +33,7 @@
     "react-dom": "^18.3.1",
     "react-native": "^0.75.3",
     "react-native-gesture-handler": "~2.16.1",
-    "react-native-maps": "^1.15.6",
+    "react-native-maps": "1.14.0",
     "react-native-open-street-map": "^2.0.1",
     "react-native-paper": "^5.12.5",
     "react-native-picker-select": "^9.3.1",

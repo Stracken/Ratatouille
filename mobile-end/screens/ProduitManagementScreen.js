@@ -12,11 +12,11 @@ const useProducts = (userId) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  //Lorsqu'un nouvel userId est fourni, la fonction fetchProducts est appelée.
   useEffect(() => {
     fetchProducts();
   }, [userId]);
-  
+  //récupérer les produits de l'API.
   const fetchProducts = async () => {
     if (!userId) {
       setError('UserId non défini');
@@ -34,25 +34,32 @@ const useProducts = (userId) => {
       setLoading(false);
     }
   };
-
+//Si userId est valide, une requête GET est effectuée pour récupérer les produits associés à cet utilisateur.
   
-
+//hook retourne les produits récupérés, l'état de chargement et d'erreur ainsi qu'une fonction pour rafraîchir les données.
   return { products, loading, error, refetch: fetchProducts };
 };
 
 const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
+  //Initialise l'état avec les valeurs initiales fournies (soit pour un nouveau produit soit pour un produit existant)
   const [product, setProduct] = useState(initialValues);
   const [isDescriptionFocused, setIsDescriptionFocused] = useState(false);
+  //Met à jour l'état du produit si initialValues change (utile lors de l'édition)
   useEffect(() => {
     setProduct(initialValues);
   }, [initialValues]);
 
-
-  
   const handleChange = (name, value) => {
-    setProduct(prev => ({ ...prev, [name]: value }));
+    setProduct(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
   };
-
+  //setProduct est une fonction de mise à jour de l'état:utilise une fonction de rappel qui reçoit l'état précédent (prevData).
+// ...prevData: utilise l'opérateur de propagation pour copier toutes les propriétés existantes de l'objet prevData.
+// [name]: value: utilise la notation de crochet pour définir dynamiquement une propriété de l'objet.
+// name devient le nom de la propriété, et value sa nouvelle valeur.
+ 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -62,10 +69,10 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
     });
 
     if (!result.canceled) {
-      handleChange('images', result.uri);
+      handleChange('images',  result.assets[0].uri);
     }
   };
-
+// Ouvre la bibliothèque d'images pour permettre à l'utilisateur de sélectionner une image. Si l'utilisateur ne cancelle pas l'opération, l'URI de l'image sélectionnée est mise à jour dans l'état du produit
   return (
     <View style={styles.form}>
       <TextInput
@@ -130,13 +137,13 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
       />
       
       <TouchableOpacity 
-        style={styles.submitButton}
-        onPress={() => onSubmit(product)}
-      >
-        <Text style={styles.submitButtonText}>
-          {isEditing ? 'Modifier le produit' : 'Ajouter le produit'}
-        </Text>
-      </TouchableOpacity>
+      style={styles.submitButton}
+      onPress={() => onSubmit(product)}
+    >
+      <Text style={styles.submitButtonText}>
+        {isEditing ? 'Modifier le produit' : 'Ajouter le produit'}
+      </Text>
+    </TouchableOpacity>
     </View>
   );
 };
@@ -162,9 +169,12 @@ const useKeyboardStatus = () => {
 
   return isKeyboardVisible;
 };
+//  hook détecte si le clavier est visible ou non , puis met à jour un état en conséquence et nettoie les listeners lors du démontage
 const ProductManagementScreen = () => {
   const {user} = useAuth()
+// Récupère les informations utilisateur via le contexte d'authentification
   const { products, loading, error, refetch } = useProducts(user?.id);
+  // Utilise le hook personnalisé pour récupérer les produits associés à cet utilisateur
   const [editingProduct, setEditingProduct] = useState(null);
   const [productData, setProductData] = useState({
     nom: '',
@@ -179,38 +189,59 @@ const ProductManagementScreen = () => {
   
   
   const handleAddProduct = async (productData) => {
-    // Vérifiez que tous les champs sont bien définis
     const { nom, categorie, images, prix, quantite, description } = productData;
   
     if (!nom || !categorie || !images || !prix || !quantite || !description) {
       Alert.alert('Erreur', 'Tous les champs requis doivent être remplis');
       return;
     }
-  
+   // Vérifie que tous les champs sont remplis avant d'ajouter un produit.
+   // Crée un FormData avec toutes les informations nécessaires.
+
+   
     try {
- // Lire le fichier image
- const response = await fetch(images);
- const blob = await response.blob();
- 
- // Créer un FormData
- const formData = new FormData();
-//  formData.append('user_id', user.id);
- formData.append('nom', nom);
- formData.append('categorie', categorie);
- formData.append('images', blob, 'image.jpg');
- formData.append('prix', prix);
- formData.append('quantite', quantite);
- formData.append('description', description);
-
- const result = await axios.post(`${API_URL}/products`, formData, {
-   headers: {
-     'Content-Type': 'multipart/form-data',
-   },
- });
-
+      const formData = new FormData();
+      formData.append('user_id', user.id); // Assurez-vous que user.id est disponible
+      formData.append('nom', nom);
+      formData.append('categorie', categorie);
+      formData.append('prix', prix.toString());
+      formData.append('quantite', quantite.toString());
+      formData.append('description', description);
+  
+      //  vérifie si la variable images commence par file:// ou content:image soit chemin local sur le système de fichiers (fichier) ou un contenu provenant d'une autre source (comme une galerie d'images)
+      if (images.startsWith('file://') || images.startsWith('content://')) {
+        // divise la chaîne images en un tableau en utilisant / comme séparateur et pop:récupère le dernier élément du tableau, qui est généralement le nom du fichier
+        const filename = images.split('/').pop();
+        // utilise une expression régulière pour extraire l'extension du fichier
+        const match = /\.(\w+)$/.exec(filename);
+        //exec(filname):applique cette expression régulière à filename. Si une correspondance est trouvée, elle renvoie un tableau ; sinon, elle renvoie null
+        // détermine le type MIME de l'image
+        const type = match ? `image/${match[1]}` : 'image';
+        // Si match n'est pas nul (extension trouvée), elle construit une chaîne comme image/jpeg,
+        // sinon type par defaut sur image
+        formData.append('images', {
+          uri: images,
+          name: filename,
+          type
+        });
+        // informations nécessaires pour l'image :
+// uri: Le chemin ou l'URI de l'image.
+// name: Le nom du fichier.
+// type: Le type MIME de l'image.
+      } else {
+        Alert.alert('Erreur', 'Format d\'image non valide');
+        return;
+      }
+     // Envoie une requête POST à l'API avec ces données.
+      const result = await axios.post(`${API_URL}/products`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
       console.log('Produit ajouté:', result.data);
-      // Gérer le succès (par exemple, naviguer vers une autre page ou afficher un message)
-      refetch(); // Rafraîchir la liste des produits
+      refetch();
+     // Rafraîchit la liste des produits après ajout réussi.
     } catch (error) {
       console.error('Erreur lors de l\'ajout du produit:', error.response?.data || error.message);
       Alert.alert('Erreur', 'Impossible d\'ajouter le produit');
@@ -307,9 +338,9 @@ const ProductManagementScreen = () => {
       <Text style={styles.title}>Gestion des Produits</Text>
       <View style={styles.formContainer}>
       <ProductForm 
-        onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
-        initialValues={editingProduct || { nom: '', categorie: '', images: '', prix: '', quantite: '', description: '' }}
-        isEditing={!!editingProduct}
+      onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
+      initialValues={editingProduct || productData}
+      isEditing={!!editingProduct}
         style={styles.productForm}
       />
        
