@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signIn, signUp, getUserData } from "../api/api";
+import { signIn, signUp } from "../api/api";
 import axios from "axios";
 
 const AuthContext = createContext();
@@ -20,8 +20,7 @@ export const AuthProvider = ({ children }) => {
       const token = await AsyncStorage.getItem("userToken");
       if (token) {
         setUserToken(token);
-        // Ici, vous pouvez ajouter une vérification du token avec votre backend
-        // et récupérer les informations de l'utilisateur si nécessaire
+   
       }
     } catch (e) {
       console.log("Erreur lors de la vérification du token:", e);
@@ -30,13 +29,13 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   };
 
-  const signInContext = async (authToken, userData) => {
+  const signInContext = async (token, userData) => {
     try {
-      console.log("Token reçu:", authToken);
+      console.log("Token reçu:", token);
       console.log("Données utilisateur reçues:", userData);
-      await AsyncStorage.setItem("userToken", authToken);
+      await AsyncStorage.setItem("userToken", token);
       await AsyncStorage.setItem("userData", JSON.stringify(userData));
-      setUserToken(authToken);
+      setUserToken(token);
       setUser(userData);
     } catch (e) {
       console.error(
@@ -62,7 +61,6 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const response = await signUp(userData);
-      // Après l'inscription, connectez automatiquement l'utilisateur
       await signIn(userData.email, userData.password);
     } catch (e) {
       console.log("Erreur lors de l'inscription:", e);

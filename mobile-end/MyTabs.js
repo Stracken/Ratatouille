@@ -5,12 +5,12 @@ import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import Colors from "./constants/Colors";
-import { useCart } from "./components/CartContext";
+import { useCart } from "./context/CartContext";
 import { useNavigation } from "@react-navigation/native";
 
 import Home from "./components/Home";
 import Products from "./components/Products";
-import BuyPage from "./components/BuyPage";
+import BuyPage from "./screens/BuyPage";
 import About from "./components/About";
 import AboutUsScreen from "./screens/aboutScreens/AboutUsScreen";
 import ContactUsScreen from "./screens/aboutScreens/ContactUsScreen";
@@ -19,7 +19,7 @@ import CookiesPage from "./screens/aboutScreens/CookiesPage";
 import ProductDetails from "./screens/ProductDetails";
 import { useAuth } from "./context/AuthContext";
 import ProductManagementScreen from "./screens/ProduitManagementScreen";
-import SearchResults from "./components/SearchResults";
+import SearchResults from "./screens/SearchResults";
 import { HeaderBackButton } from "@react-navigation/elements";
 
 const Tab = createBottomTabNavigator();
@@ -163,7 +163,7 @@ function MyTabs() {
           name="ProduitManagement"
           component={ProductManagementStack}
           options={{
-            tabBarLabel: "Gestion produitss",
+            tabBarLabel: "Gestion produits",
             tabBarIcon: ({ color }) => (
               <Ionicons name="cog" size={20} color={color} />
             ),
@@ -197,7 +197,7 @@ function MyTabs() {
         options={{
           tabBarLabel: "Recherche",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="nutrition" size={20} color={color} />
+            <Ionicons name="search-outline" size={20} color={color} />
           ),
         }}
       />

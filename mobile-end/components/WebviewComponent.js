@@ -1,7 +1,5 @@
 import WebView from "react-native-webview";
-import { View, Text, StyleSheet } from "react-native";
-import { DefaultTheme } from "@react-navigation/native";
-import Colors from "../constants/Colors";
+import { StyleSheet } from "react-native";
 
 export default function WebviewComponent() {
   return (

@@ -18,8 +18,7 @@ export const signUp = async (userData) => {
 
     return await response.json();
   } catch (error) {
-    console.error("Erreur lors de l'inscription:", error);
-    throw error;
+    throw new Error(`Erreur lors de l'inscription: ${error.message}`);
   }
 };
 
@@ -41,7 +40,6 @@ export const signIn = async (email, password) => {
     
     
   } catch (error) {
-    console.error("Erreur lors de la connexion (api):", error);
-    throw error;
+    throw new Error(`Erreur lors de la connexion (api): ${error.message}`);
   }
 };

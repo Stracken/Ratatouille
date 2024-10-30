@@ -25,7 +25,7 @@ export const login = (credentials) => {
 };
 
 export const signup = (userData) => {
-  return api.post('/signup', userData);
+  return api.post('/logup', userData);
 };
 
 export const addProduct = (productData) => {

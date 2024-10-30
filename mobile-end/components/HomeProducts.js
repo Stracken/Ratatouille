@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, FlatList, Dimensions } from "react-native";
 import ProductCard from "./ProductCard";
-import { useCart } from "./CartContext";
+import { useCart } from "../context/CartContext";
 import axios from "axios";
 import { API_URL } from "../config";
 
@@ -38,7 +38,7 @@ const HomeProducts = () => {
     // Vérifiez si l'URI est valide
     if (typeof imageUri !== "string") {
       console.error("URI d'image invalide:", imageUri);
-      return null; 
+      return null;
     }
 
     return (

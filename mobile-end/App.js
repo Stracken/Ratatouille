@@ -5,12 +5,11 @@ import MainApp from "./MainApp";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { CartProvider } from "./components/CartContext";
+import { CartProvider } from "./context/CartContext";
 import LoginScreen from "./screens/LoginScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
-import { StripeProvider } from '@stripe/stripe-react-native';
-import { PUBLIC_KEY } from "./config";
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 const Stack = createStackNavigator();
 
@@ -57,16 +56,15 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-       <StripeProvider
-      publishableKey="pk_test_51PfNmyRpKgZkfjqiZU6RXcDkGN4tjVTxY5TA9twzE48MEUMQe8fQojaXd7wJWUaSbRg2jgHmprVUWBGvQ8v8b41K00NeOYreRk"
-      // merchantIdentifier="merchant.com.terroterro.app" // Pour Apple Pay
-    >
-      <AppContent />
+      <StripeProvider
+        publishableKey="pk_test_51PfNmyRpKgZkfjqiZU6RXcDkGN4tjVTxY5TA9twzE48MEUMQe8fQojaXd7wJWUaSbRg2jgHmprVUWBGvQ8v8b41K00NeOYreRk"
+        // merchantIdentifier="merchant.com.terroterro.app" // Pour Apple Pay
+      >
+        <AppContent />
       </StripeProvider>
     </AuthProvider>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

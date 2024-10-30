@@ -53,10 +53,15 @@ const CustomHeader = ({ openModal }) => {
 
   useEffect(() => {
     Animated.timing(animatedHeight, {
+      //Animated.timing() : méthode de l'API Animated qui crée une animation basée sur le temps1. Elle permet de définir une animation qui se déroule sur une durée spécifique.
       toValue: isSearchActive ? 110 : 60,
+      //toValue: isSearchActive ? 110 : 60 : C'est la valeur cible de l'animation. Si isSearchActive est vrai, la hauteur animera vers 110, sinon vers 60. Cela permet de basculer entre deux hauteurs différentes
       duration: 300,
+      //duration: 300 : C'est la durée de l'animation en millisecondes (0.3 secondes)
       useNativeDriver: false,
+      //useNativeDriver: false : Cette option indique que l'animation sera gérée par JavaScript plutôt que par le moteur natif. C'est nécessaire pour animer des propriétés de mise en page comme la hauteur
     }).start();
+    //start() : Cette méthode démarre l'animation
   }, [isSearchActive]);
 
   const toggleSearch = () => {
@@ -68,17 +73,24 @@ const CustomHeader = ({ openModal }) => {
   };
 
   const searchProducts = useCallback(
+    //useCallback: utilisé pour mémoriser cette fonction. Elle ne sera recréée que si navigation change, optimisant ainsi les performances en évitant des re-rendus inutiles
     async (query) => {
       if (query.length > 2) {
+        //Vérifie si la requête a plus de 2 caractères. Cela évite de faire des recherches pour des requêtes trop courtes, réduisant ainsi les appels API inutiles
         setIsLoading(true);
         try {
           const response = await fetch(`${API_URL}/search-products?q=${query}`);
+          //?:marque le début des paramètres de requête
+          //q:paramètre de requête pour la recherche
+          // interpolation de chaîne => URL dynamique pour la requete
           const data = await response.json();
           if (data.products && Array.isArray(data.products)) {
+            //Vérifie si les données reçues ont le format attendu (un tableau de produits)
             // Filtrer les résultats côté client si nécessaire
             const filteredResults = data.products.filter((product) =>
               product.nom.toLowerCase().includes(query.toLowerCase())
             );
+            //Filtre les résultats côté client et etablis l'entrée utilisateur en minuscule
             navigation.navigate("Search", {
               screen: "SearchResults",
               params: { searchResults: filteredResults, searchQuery: query },
@@ -121,7 +133,7 @@ const CustomHeader = ({ openModal }) => {
 
   const getItemLayout = useCallback(
     (data, index) => ({
-      length: 50, // Hauteur estimée de chaque élément
+      length: 50, 
       offset: 50 * index,
       index,
     }),
@@ -164,7 +176,7 @@ const CustomHeader = ({ openModal }) => {
             <TextInput
               style={styles.input}
               placeholderTextColor={Colors.black}
-              placeholder="Agriculteurs, Producteurs, ..."
+              placeholder="Produits..."
               autoFocus
               value={searchQuery}
               onChangeText={setSearchQuery}

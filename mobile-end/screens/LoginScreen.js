@@ -11,7 +11,6 @@ import { useAuth } from "../context/AuthContext";
 import Colors from "../constants/Colors";
 import { signIn } from "../api/api"; 
 import tinycolor from "tinycolor2";
-import { API_URL } from "../config";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -46,8 +45,7 @@ const LoginScreen = ({ navigation }) => {
       await signInContext(token, user);
       console.log("Après mise à jour du contexte");
       // La navigation sera gérée par le navigateur principal basé sur l'état d'authentification
-      // Vous pouvez supprimer cette ligne si vous utilisez un navigateur conditionnel
-      // navigation.navigate("NavigationTest", { user: user.name });
+      
     } catch (error) {
       console.error("Erreur détaillée:", error);
       setError(error.message || "Identifiants invalides");

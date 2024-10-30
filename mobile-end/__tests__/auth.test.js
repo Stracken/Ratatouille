@@ -1,26 +1,28 @@
-import { signUp, signIn } from './api/api.js'; 
+import { signUp, signIn } from '../api/api.js'; 
 describe('Auth API', () => {
-  
+  //Commence un bloc de description pour les tests de l'API d'authentification
   beforeEach(() => {
     jest.resetAllMocks();
   });
-
+//Avant chaque test, réinitialise tous les mocks de Jest
   describe('signUp', () => {
+    //Commence un bloc de description pour les tests de la fonction signUp
     it('should sign up successfully', async () => {
+      //Définit un test pour vérifier si l'inscription réussit
       const userData = { email: 'test@example.com', password: 'password123' };
       const mockResponse = { message: 'Inscription réussie' };
-
+//Prépare les données de test et la réponse simulée
       global.fetch = jest.fn(() =>
         Promise.resolve({
           ok: true,
           json: () => Promise.resolve(mockResponse),
         })
       );
-
+//Remplace la fonction fetch globale par un mock qui simule une réponse réussie
       const response = await signUp(userData);
       expect(response).toEqual(mockResponse);
     });
-
+//Appelle signUp et vérifie que la réponse correspond à la réponse simulée
     it('should throw an error on failed sign up', async () => {
       const userData = { email: 'test@example.com', password: 'password123' };
       const mockErrorResponse = { error: 'Email déjà utilisé' };

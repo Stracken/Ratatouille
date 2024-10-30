@@ -74,9 +74,10 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
   };
 // Ouvre la bibliothèque d'images pour permettre à l'utilisateur de sélectionner une image. Si l'utilisateur ne cancelle pas l'opération, l'URI de l'image sélectionnée est mise à jour dans l'état du produit
   return (
+    <View style={styles.mainForm}>
     <View style={styles.form}>
       <TextInput
-        style={styles.input}
+        style={styles.nameInput}
         placeholder="Nom du produit"
         value={product.nom}
         placeholderTextColor="black"
@@ -145,6 +146,7 @@ const ProductForm = ({ onSubmit, initialValues, isEditing }) => {
       </Text>
     </TouchableOpacity>
     </View>
+    </View>
   );
 };
 //hook personnalisé pour détecter l'état du clavier  
@@ -201,7 +203,7 @@ const ProductManagementScreen = () => {
    
     try {
       const formData = new FormData();
-      formData.append('user_id', user.id); // Assurez-vous que user.id est disponible
+      formData.append('user_id', user.id); 
       formData.append('nom', nom);
       formData.append('categorie', categorie);
       formData.append('prix', prix.toString());
@@ -310,7 +312,7 @@ const ProductManagementScreen = () => {
         <Text>Image non disponible</Text>
       </View>
     )}
-      <Text style={styles.productTitle}>{item.nom}</Text>
+      {/* <Text style={styles.productTitle}>{item.nom}</Text> */}
       <Text style={styles.categorie}>{item.categorie}</Text>
       <Text>{item.prix} €</Text>
       <Text>unités restantes: {item.quantite} </Text>
@@ -366,19 +368,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
   },
+  
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     margin: 10,
     marginTop:15,
     textAlign: 'center',
-    color:Colors.black
+    color:Colors.black,
+    
   },
   formContainer: {
     height:'40%'},
+    
 
   listContainer: {
-    height:'52%'
+    height:'45%',
+    paddingTop:20
   },
   image: {
     width: 100,
@@ -390,10 +396,32 @@ const styles = StyleSheet.create({
     gap:40,
     paddingHorizontal:40,
   },
+  mainForm:{
+    alignItems:'center',
+    justifyContent:'center',
+    height:'100%',
+    width:'100%',
+    
+  },
   input: {
     color: Colors.danger,
     height: 30,
     borderWidth: 1,
+    marginBottom: 5,
+    paddingHorizontal: 10,
+    backgroundColor: tinycolor(Colors.white).setAlpha(0.1).toString(),
+    borderColor: Colors.white,
+    textAlign: "center",
+    width: 300,
+    borderRadius: 10,
+    fontWeight: 'bold',
+    fontSize:14
+  },
+  nameInput: {
+    color: Colors.danger,
+    height: 30,
+    borderWidth: 1,
+    marginTop:30,
     marginBottom: 5,
     paddingHorizontal: 10,
     backgroundColor: tinycolor(Colors.white).setAlpha(0.1).toString(),

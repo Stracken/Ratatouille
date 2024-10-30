@@ -10,7 +10,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import ProductCard from "./ProductCard";
-import { useCart } from "./CartContext";
+import { useCart } from "../context/CartContext";
 import Colors from "../constants/Colors";
 import axios from "axios";
 import { API_URL } from "../config";
@@ -117,13 +117,7 @@ const Products = ({ route }) => {
             label={ALL_CATEGORIES}
             value={ALL_CATEGORIES}
           />
-          {/* {categories.map((category) => (
-                    <Picker.Item 
-                        key={category} 
-                        label={category === 'Tous les produits' ? category : category.charAt(0).toUpperCase() + category.slice(1)} 
-                        value={category} 
-                    />
-                ))} */}
+
           {categories.map((category) => (
             <Picker.Item
               key={category}

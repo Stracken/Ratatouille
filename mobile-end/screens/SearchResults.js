@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import ProductCard from "./ProductCard";
-import { useCart } from "./CartContext";
+import ProductCard from "../components/ProductCard";
+import { useCart } from "../context/CartContext";
 import Colors from "../constants/Colors";
 import StyledText from "react-native-styled-text";
 

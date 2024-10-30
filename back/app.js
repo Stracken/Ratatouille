@@ -321,33 +321,33 @@ app.post('/signup', async (req, res) => {
       });
 
    
-   app.get('/:categorie', async (req, res) => {
-    try {
-      // Récupération de tous les produits depuis la base de données
-      pool.query(
-        'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit ORDER BY date_creation DESC',
-        (err, results) => {
-          if (err) {
-            console.error("Erreur lors de la récupération des produits:", err);
-            return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
-          }
-          // Convertir les images en Base64
-          const productsWithImages = results.map(product => ({
-            ...product,
-            images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
-          }));
-          // Renvoyer tous les produits trouvés
-          res.status(200).json({
-            message: 'Produits récupérés avec succès',
-            products:productsWithImages
-          });
-        }
-      );
-    } catch (error) {
-      console.error("Erreur lors de la récupération des produits:", error);
-      res.status(500).json({ error: 'Erreur interne du serveur' });
-    }
-  });
+  //  app.get('/:categorie', async (req, res) => {
+  //   try {
+  //     // Récupération de tous les produits depuis la base de données
+  //     pool.query(
+  //       'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit ORDER BY date_creation DESC',
+  //       (err, results) => {
+  //         if (err) {
+  //           console.error("Erreur lors de la récupération des produits:", err);
+  //           return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
+  //         }
+  //         // Convertir les images en Base64
+  //         const productsWithImages = results.map(product => ({
+  //           ...product,
+  //           images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
+  //         }));
+  //         // Renvoyer tous les produits trouvés
+  //         res.status(200).json({
+  //           message: 'Produits récupérés avec succès',
+  //           products:productsWithImages
+  //         });
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.error("Erreur lors de la récupération des produits:", error);
+  //     res.status(500).json({ error: 'Erreur interne du serveur' });
+  //   }
+  // });
 
 //lire tous les produits par tout utilisateur (avec un filtre prédéfinini du plus récent au plus ancien)
 app.get('/product', async (req, res) => {
@@ -377,10 +377,67 @@ app.get('/product', async (req, res) => {
     res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
+
+// app.get('/product', async (req, res) => {
+//   try {
+//     // Requête SQL modifiée avec une jointure pour inclure les informations de l'utilisateur
+//     const query = `
+//       SELECT p.*, u.nom, u.prenom, u.email, u.telephone, u.adresse, u.ville, u.code_postal, u.raison_sociale
+//         FROM produit p
+//         LEFT JOIN user u ON p.user_id = u.id
+//         WHERE p.user_id = ?
+//       ORDER BY p.date_creation DESC
+//     `;
+
+//     pool.query(query, (err, results) => {
+//       if (err) {
+//         console.error("Erreur lors de la récupération des produits:", err);
+//         return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
+//       }
+
+//       // Convertir les images en Base64 et structurer les données de l'utilisateur
+//       const productsWithImages = results.map(product => ({
+//         id: product.id,
+//         nom: product.nom,
+//         categorie: product.categorie,
+//         prix: product.prix,
+//         quantite: product.quantite,
+//         description: product.description,
+//         date_creation: product.date_creation,
+//         images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
+//         userId: {
+//           id: product.user_id,
+//           nom: product.user_nom,
+//           prenom: product.user_prenom,
+//           email: product.email,
+//           telephone: product.telephone,
+//           adresse: product.adresse,
+//           ville: product.ville,
+//           code_postal: product.code_postal,
+//           raison_sociale: product.raison_sociale
+//         }
+//       }));
+
+//       // Renvoyer tous les produits trouvés avec les informations de l'utilisateur
+//       res.status(200).json({
+//         message: 'Produits récupérés avec succès',
+//         products: productsWithImages
+//       });
+//     });
+//   } catch (error) {
+//     console.error("Erreur lors de la récupération des produits:", error);
+//     res.status(500).json({ error: 'Erreur interne du serveur' });
+//   }
+// });
+
+
+
+
 /////////////////////////////////////////// barre de recherche /////////////////////////////////////////////////////////////////////////////////////////////////////////
 app.get('/search-products', async (req, res) => {
   try {
     const { q } = req.query;
+    //Extrait le paramètre de recherche 'q' de l'URL
     if (!q || q.length < 3) {
       return res.status(400).json({ error: "La requête de recherche doit contenir au moins 3 caractères" });
     }
@@ -388,6 +445,7 @@ app.get('/search-products', async (req, res) => {
     pool.query(
       'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit WHERE nom LIKE ? ORDER BY date_creation DESC',
       [`%${q}%`],
+      //Utilise LIKE pour une recherche partielle avec le joker %.
       (err, results) => {
         if (err) {
           console.error("Erreur lors de la recherche des produits:", err);
@@ -411,33 +469,33 @@ app.get('/search-products', async (req, res) => {
   }
 });
 
-app.get('/produit/', async (req, res) => {
-  try {
-    // Récupération de tous les produits depuis la base de données
-    pool.query(
-      'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit ORDER BY date_creation DESC',
-      (err, results) => {
-        if (err) {
-          console.error("Erreur lors de la récupération des produits:", err);
-          return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
-        }
-        // Convertir les images en Base64
-        const productsWithImages = results.map(product => ({
-          ...product,
-          images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
-        }));
-        // Renvoyer tous les produits trouvés
-        res.status(200).json({
-          message: 'Produits récupérés avec succès',
-          products:productsWithImages
-        });
-      }
-    );
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits:", error);
-    res.status(500).json({ error: 'Erreur interne du serveur' });
-  }
-});
+// app.get('/produit/', async (req, res) => {
+//   try {
+//     // Récupération de tous les produits depuis la base de données
+//     pool.query(
+//       'SELECT id, nom, categorie, prix, quantite, description, user_id, images FROM produit ORDER BY date_creation DESC',
+//       (err, results) => {
+//         if (err) {
+//           console.error("Erreur lors de la récupération des produits:", err);
+//           return res.status(500).json({ error: "Erreur lors de la récupération des produits" });
+//         }
+//         // Convertir les images en Base64
+//         const productsWithImages = results.map(product => ({
+//           ...product,
+//           images: product.images ? `data:image/jpeg;base64,${Buffer.from(product.images).toString('base64')}` : null,
+//         }));
+//         // Renvoyer tous les produits trouvés
+//         res.status(200).json({
+//           message: 'Produits récupérés avec succès',
+//           products:productsWithImages
+//         });
+//       }
+//     );
+//   } catch (error) {
+//     console.error("Erreur lors de la récupération des produits:", error);
+//     res.status(500).json({ error: 'Erreur interne du serveur' });
+//   }
+// });
 
 ////////////                       CRUD PRODUIT  MANAGEMENT/////
 // Lire un product ajouté par l'identifiant
@@ -451,7 +509,7 @@ app.get('/products/:userId', async (req, res) => {
         return res.status(400).json({ error: 'UserId est requis' });
       }
   
-      // Requête modifiée avec une jointure
+      // Requête avec une jointure
       const query = `
         SELECT p.*, u.nom, u.prenom, u.email, u.telephone, u.adresse, u.ville, u.code_postal, u.raison_sociale
         FROM produit p
@@ -588,11 +646,13 @@ app.delete('/products/:id', async (req, res) => {
 //intention de paiement
 app.post('/create-payment-intent', async (req, res) => {
   const { items } = req.body;
-
+//Chaque item représente un produit avec sa quantité
   try {
     let total = 0;
+    //Initialise une variable total pour calculer le montant total de la commande
     for (const item of items) {
       const [rows] = await pool.promise().query('SELECT prix, quantite FROM produit WHERE id = ?', [item.id]);
+      //Parcourt chaque item et interroge la base de données pour obtenir le prix et la quantité disponible du produit
       if (rows.length > 0) {
         const { prix, quantite } = rows[0];
         if (item.quantity > quantite) {
@@ -601,17 +661,18 @@ app.post('/create-payment-intent', async (req, res) => {
         total += prix * item.quantity;
       }
     }
-
+//Vérifie si la quantité demandée est disponible et calcule le total
     if (total < 0.50) {
       return res.status(400).json({ error: 'Le montant total doit être d\'au moins 0,50 €' });
     }
-
+//Vérifie si le montant total est supérieur au minimum requis par Stripe
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(total * 100),
       currency: 'eur',
     });
-
+//intention de paiement avec Stripe, convertissant le montant en centimes
     return res.json({ clientSecret: paymentIntent.client_secret });
+    //Renvoie le client_secret au client pour finaliser le paiement côté client
   } catch (error) {
     console.error('Erreur lors de la création de l\'intention de paiement:', error);
     return res.status(500).json({ error: 'Erreur lors de la création de l\'intention de paiement' });
@@ -625,24 +686,28 @@ app.post('/update-quantities', async (req, res) => {
   if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Items est requis et doit être un tableau.' });
   }
-
+  //méthode statique de l'objet global Array en JavaScript
+//Vérifie que items est un tableau non vide
   const connection = await pool.getConnection();
+  //Obtient une connexion à la base de données depuis le pool
   try {
-      await connection.beginTransaction(); // Démarre une transaction
+      await connection.beginTransaction(); 
+      // Démarre une transaction pour garantir l'intégrité des données
 
       await Promise.all(items.map(async (item) => {
           const [result] = await connection.query(
               'UPDATE produit SET quantite = quantite - ? WHERE id = ? AND quantite >= ?',
               [item.quantity, item.id, item.quantity]
           );
-
+//Met à jour la quantité de chaque produit
           if (result.affectedRows === 0) {
               throw new Error(`Quantité insuffisante pour le produit ${item.id}`);
           }
       }));
-
+//Vérifie si la mise à jour a réussi pour chaque produit
       await connection.commit(); // Valide la transaction
       res.json({ success: true });
+      //Valide la transaction et envoie une réponse de succès
   } catch (error) {
       console.error('Erreur lors de la mise à jour des quantités:', error);
       await connection.rollback(); // Annule la transaction en cas d'erreur
